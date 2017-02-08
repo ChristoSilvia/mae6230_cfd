@@ -4,6 +4,28 @@
 
 \begin{document}
 
+\section{Partners}
+
+
+
+\section{Free Shear Flows}
+
+In this section, we investigate two types of 2D free shear flows:
+	the splitter-plate and the wake.
+In the splitter-plate, two flows of different velocity are separated by
+	a splitter, until they meet and mix.
+In the wake, interactions with an obstacle cause a region of reduced
+	velocity behind an object, and this region of reduced
+	velocity spreads and diffuses as the fluid continues onwards.
+
+\subsection{Deriving the Governing Equations}
+
+To begin our analysis of 2D shear flows, we need to determine exactly 
+	which partial differential equations and boundary conditions
+	we need to use.
+
+\subsubsection{Simplifying Navier-Stokes for 2D free shear flow}
+
 The 2D navier-stokes equations for a newtonian fluid are:
 
 \begin{align}
@@ -55,9 +77,20 @@ The navier-stokes equations now become ($\nu = \frac{\mu}{\rho}$):
 
 \begin{align}
 \partial_i u_i & = 0 \\
-\partial_t u_i + u_j \partial_j u_i & = \nu \nabla^2 u_i\\
+\partial_t u_i + u_j \partial_j u_i & = \nu \nabla^2 u_i
 \end{align}
 
+\subsubsection{Boundary conditions}
 
+The boundary conditions are simple: the boundaries of the region of interest
+	all are frictionless, which requires that the local fluid velocity
+	be parallel to the boundaries.
+For the splitter plate, the flows on the top and bottom of the splitter
+	plate have their velocities specified, while the flow should
+	extend indefinitely past the splitter plate.
+For the wake, the flow velocities of the flow input to the region of interest
+	are specified, while the flow should extend indefinitely further.
+
+\subsection{Mixing Layer Solution}
 
 \end{document}
