@@ -2,6 +2,8 @@
 
 \usepackage{amsmath}
 
+\DeclareMathOperator\erf{erf}
+
 \begin{document}
 
 \section{Partners}
@@ -92,5 +94,123 @@ For the wake, the flow velocities of the flow input to the region of interest
 	are specified, while the flow should extend indefinitely further.
 
 \subsection{Mixing Layer Solution}
+
+By deciding to move in a reference frame which moves with the average fluid
+	velocity, the mixing layer problem is simplified.
+Instead of the two fluids moving with large velocities, with their velocities
+	being slightly different, in the moving reference frame the two fluids 
+	move in opposite directions.
+The faster fluid moves with velocity $U\hat{x}$ in the moving
+	frame, and the slower fluid moves with velocity $-U\hat{x}$.
+The price we pay for this misdirection is that the relative fluid velocities
+	must be small.
+An intuitive reason for this being the case is that for the mixing
+	to be time-evolving, the two fluids must be carried away from the
+	splitter far faster then the timescale on which they mix.
+
+Since we're in a moving reference frame, the spatially-and-temporally
+	propagating problem from before now reduces just to a temporally
+	evolving system.
+Since the fluid is moving much faster than the relative velocities,
+	we can assume that any non-uniformities along the direction
+	of flow are on much larger scales than in the direction
+	between the two fluids.
+We can therefore assume that the fluid is identical in the $x$ 
+	direction.
+
+We assume that at time $t=0$, when the fluids just pass the splitter-plate,
+	the fluid above $y=0$ is all moving with velocity $U \hat{x}$,
+	and the fluid below $y=0$ is all moving with velocit $-U \hat{x}$.
+Since the velocities are small, as assumed before, we can neglect the
+	convective term, which is quadratic in velocity.
+Since the velocity we care about is the velocity in the $\hat{x}$ direction,
+	and we only see it varying along $y$, we can write this as 
+	$u(y)$ and consider only the diffusion of $u$ along $y$ over time:
+
+\begin{align}
+\frac{\partial u}{\partial t} & = \frac{\partial^2 u}{\partial y^2}
+\end{align}
+
+As for initial conditions, we assume that because of whatever physics
+	occurs at the splitter plate, the initial conditions are
+	not an exact step function, but follow the following 
+	profile:
+
+\begin{align}
+u(y,t=0) & = U \erf \left( \frac{ \sqrt{\pi} y}{\delta } \right)
+\end{align}
+
+We will attack this problem with the Fourier transform.
+We will use the convention where $\mathcal{F}(f(x))(\xi) =
+	 \int f(x) e^{-2 \pi i \xi y} dx$.
+With this convention, $\mathcal{F} \left(\partial_y u(y)\right) 
+	= 2\pi i \xi \hat{u}(\xi)$
+Thus, $\mathcal{F} \left(\partial_y^2 u(y)\right) 
+	= - 4 \pi^2 \xi^2 \hat{u}(\xi)$.
+We can now write the PDE, transformed to $\xi$-space, and its solution
+	for different values of $t$:
+
+\begin{align}
+\partial_t \hat{u}(\xi, t) & = - 4 \pi^2 \nu \xi^2 \hat{u}(\xi, t) \\
+\hat{u}(\xi, t) & = \exp \left( - 4 \pi^2 \xi^2 \nu t \right) \hat{u}(\xi, 0)
+\end{align}
+
+Since we know $u(x,0)$, we can find $\hat{u}(\xi, 0)$.
+The fourier transform of $\erf$ is $\frac{- i e^{-\pi^2 \xi^2}}{\pi \xi}$.
+Since the fourier transform of $f(a x)$ is simply $f(\xi/a)/a$,
+	the fourier transform of $U \erf \left( 
+	\frac{ \sqrt{\pi} y}{\delta } \right)$ is:
+
+\begin{align}
+\hat{u}(\xi, 0) & = U
+	\frac{- i }{\pi \xi}\exp \left(-\pi \delta^2 \xi^2\right) \\
+\hat{u}(\xi, t) & = U \frac{- i}{\pi \xi} 
+	\exp\left(- \pi \xi^2 \left( \delta^2 + 4 \pi \nu t \right) \right)\\
+& = U \frac{- i}{\pi \xi} 
+	\exp\left(- \pi^2 \left( \frac{\xi}{\frac{\sqrt{\pi}}{
+	\sqrt{\delta^2 + 4 \pi \nu t}}} \right)^2 \right) \nonumber
+\end{align}
+
+We can do an inverse fourier transform, using the formula for the fourier
+	transform of $\erf$, to get:
+
+\begin{align}
+u(y,t) & = U \erf \left( y \frac{\sqrt{\pi}}
+	{\sqrt{\delta^2 + 4 \pi \nu t}} \right) \nonumber \\
+u(y,t) & = U \erf \left( \frac{ \sqrt{\pi} y}{\delta} 
+	\sqrt{ \frac{\delta^2}{\delta^2 + 4 \pi \nu t}} \right) 
+\end{align}
+
+\subsubsection{Vorticity Thickness}
+
+We can define the vorticity thickness $\delta_w$ as:
+
+\begin{align}
+\delta_w & = \frac{\Delta U}{\left( \partial u / \partial y \right)_\text{max}}
+\end{align}
+
+The derivative of $\erf$ is $\partial_x \erf(x) 
+	= \frac{2}{\sqrt{\pi}} e^{-x^2}$.
+Thus:
+
+\begin{align}
+\partial u / \partial y & = \frac{2 U}{\sqrt{\pi}} 
+	\exp \left( - \left( \frac{ \sqrt{\pi} y}{\delta} 
+	\sqrt{ \frac{\delta^2}{\delta^2 + 4 \pi \nu t}} \right)^2 \right) 
+	\frac{ \sqrt{\pi}}{\delta} 
+	\sqrt{ \frac{\delta^2}{\delta^2 + 4 \pi \nu t}} \nonumber \\
+\left( \partial u / \partial y \right)_\text{max} & =
+	2 U \frac{1}{\delta} \frac{1}{\sqrt{1 + \frac{4 \pi \nu}{\delta^2} t}}\\
+\delta_w & = \delta \sqrt{ 1 + \left( \frac{4 \pi \nu}{\delta^2} \right) t } 
+\end{align}
+
+We can see that in the limit of zero viscosity, $\delta_w = \delta$.
+
+\subsection{Wake}
+
+To solve the wake problem, we will follow the same general procedure
+	as before.
+
+The initial velocity
 
 \end{document}
