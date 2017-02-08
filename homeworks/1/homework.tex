@@ -1,0 +1,63 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+The 2D navier-stokes equations for a newtonian fluid are:
+
+\begin{align}
+\partial_t \rho + \partial_i \left( \rho u_i \right) & = 0 \\
+\partial_t \left( \rho u_i \right) + \partial_j \left( \rho u_i u_j \right)
+	& = - \partial_i p + \partial_j \tau_{ij} + \rho g_i\\
+\tau_{ij} & = \mu \left( \partial_i u_j + \partial_j u_i \right)
+\end{align}
+
+Suppose our experiment is taking place in a thin region between two
+	flat frictionless plates, and that the plates are placed horizontally.
+If our velocities are not too high, then the material properties are not
+	expected to change drastically, and we can thus assume constant
+	density and constant viscosity.
+Since our experiment is between two plates, all velocities are two-dimensional
+	velocities.
+Since our plates are placed horizontally, we can neglect all body forces.
+Similarly, since our plates are placed horizontally, and the region
+	of interest is very thin, and we assume that a constant pressure
+	from the atmosphere is applied on both sides of the plates,
+	then we can assume that the pressure within the region of 
+	interest is constant.
+
+If we assume constant density, we can simplify the mass-conservation
+	equations drastically, and we can also simplify the momentum 
+	equation by dividing by density. 
+When density is constant, the mass conservation equation simply becomes
+	$\partial_i u_i = 0$.
+
+This will also have an impact on the momentum equation: note that 
+	$\partial_j \left( u_i u_j \right) =
+	\left( \partial_j u_i \right) u_j 
+	+ u_i \left( \partial_j u_j \right)$.
+Since we found that constant density implied that $\partial_j u_j = 0$,
+	we can drop the second term and just write $u_j \partial_j u_i$.
+
+If we assume constant viscosity, we can move the viscosity out of the 
+	derivative of the deviatoric stress $\tau$.
+Now, $\partial_j \tau_{ij} = \mu \left( \partial_i 
+	\left( \partial_j u_j \right) + \partial_j \partial_j u_i \right)$.
+Since we found that constant density implied $\partial_j u_j = 0$,
+	we can thus conclude that $\partial_j \tau_{ij} 
+	= \mu \partial_j \partial_j u_i$.
+
+If we neglect body forces, we can drop the $\rho g_i$ term.
+Similarly if we neglect pressure forces, we can drop the $\partial_i p$ term.
+
+The navier-stokes equations now become ($\nu = \frac{\mu}{\rho}$):
+
+\begin{align}
+\partial_i u_i & = 0 \\
+\partial_t u_i + u_j \partial_j u_i & = \nu \nabla^2 u_i\\
+\end{align}
+
+
+
+\end{document}
