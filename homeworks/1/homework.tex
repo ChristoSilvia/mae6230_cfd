@@ -211,6 +211,38 @@ We can see that in the limit of zero viscosity, $\delta_w = \delta$.
 To solve the wake problem, we will follow the same general procedure
 	as before.
 
-The initial velocity
+\begin{align}
+u(y,0) & = -U\exp\left(-\frac{\pi y^2}{\delta^2} \right)\\
+\hat{u}(\xi, 0) & = - U \sqrt{ \frac{\pi}{\frac{\pi}{\delta^2}}}
+	\exp \left( - \frac{ (\pi \xi)^2}{ \frac{\pi}{\delta^2}} \right)
+	\nonumber \\
+\hat{u}(\xi, 0)& = - U \delta \exp \left( - 
+	\pi \left( \delta \xi \right)^2 \right) \\	
+\hat{u}(\xi, t) & = - U \delta 
+	\exp \left( - \pi \left( \delta \xi \right)^2 \right)
+	\exp \left( - 4 \pi^2 \xi^2 \nu t \right) \nonumber\\
+\hat{u}(\xi, t) & = - U \delta
+	\sqrt{ \frac{\frac{1}{ \frac{\delta^2}{\pi} + 4 \nu t}}{\pi}}
+	\sqrt{ \frac{\pi}{ \frac{1}{ \frac{\delta^2}{\pi} + 4 \nu t}}}
+	\exp \left( - \frac{ ( \pi \xi )^2}
+	{ \frac{1}{ \frac{\delta^2}{\pi} + 4 \nu t}} \right) \nonumber\\
+u(y, t) & = - U \sqrt{ \frac{\delta^2}{ \delta^2 + 4 \pi \nu t}}
+	\exp \left( \frac{-\pi y^2}{ \delta^2 + 4 \pi \nu t} \right)
+\end{align}
+
+The wake half-width $b$ is defined as the width between the centerline
+	and the point where the velocity profile drops to half its
+	maximum deficit value.
+If the velocity profile is proportional to $\exp(-a x^2)$, this point occurs
+	where $\exp(-a b^2) = 1/2$.  
+This occurs at $b = \sqrt{\frac{\log 2}{a}}$.
+In the velocity profile above, $a(t) = \frac{\pi}{\delta^2 + 4 \pi \nu t}$.
+Thus:
+
+\begin{align}
+b(t) & = \sqrt{ \frac{ \log 2}{\pi} \left( \delta^2 + 4 \pi \nu t \right) }
+\end{align}
+
+In the case of no viscosity, $b = \delta \sqrt{\frac{\log 2}{\pi}}$
 
 \end{document}
