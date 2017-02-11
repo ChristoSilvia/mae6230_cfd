@@ -39,17 +39,22 @@ The 2D navier-stokes equations for a newtonian fluid are:
 
 Suppose our experiment is taking place in a thin region between two
 	flat frictionless plates, and that the plates are placed horizontally.
-If our velocities are not too high, then the material properties are not
-	expected to change drastically, and we can thus assume constant
+If our velocities are not too high, and the material properties are not
+	expected to change drastically, we can thus assume constant
 	density and constant viscosity.
 Since our experiment is between two plates, all velocities are two-dimensional
 	velocities.
-Since our plates are placed horizontally, we can neglect all body forces.
+Since our plates are placed horizontally, with a very small height,
+	the body forces are not going to cause a significant difference
+	in pressure, and can thus be neglected.
 Similarly, since our plates are placed horizontally, and the region
 	of interest is very thin, and we assume that a constant pressure
 	from the atmosphere is applied on both sides of the plates,
 	then we can assume that the pressure within the region of 
 	interest is constant.
+
+If we neglect body forces, we can drop the $\rho g_i$ term.
+Similarly if we neglect pressure forces, we can drop the $\partial_i p$ term.
 
 If we assume constant density, we can simplify the mass-conservation
 	equations drastically, and we can also simplify the momentum 
@@ -57,7 +62,8 @@ If we assume constant density, we can simplify the mass-conservation
 When density is constant, the mass conservation equation simply becomes
 	$\partial_i u_i = 0$.
 
-This will also have an impact on the momentum equation: note that 
+This will also have an impact on the momentum equation. 
+The convection term is given by the following expression:
 	$\partial_j \left( u_i u_j \right) =
 	\left( \partial_j u_i \right) u_j 
 	+ u_i \left( \partial_j u_j \right)$.
@@ -72,9 +78,6 @@ Since we found that constant density implied $\partial_j u_j = 0$,
 	we can thus conclude that $\partial_j \tau_{ij} 
 	= \mu \partial_j \partial_j u_i$.
 
-If we neglect body forces, we can drop the $\rho g_i$ term.
-Similarly if we neglect pressure forces, we can drop the $\partial_i p$ term.
-
 The navier-stokes equations now become ($\nu = \frac{\mu}{\rho}$):
 
 \begin{align}
@@ -84,14 +87,42 @@ The navier-stokes equations now become ($\nu = \frac{\mu}{\rho}$):
 
 \subsubsection{Boundary conditions}
 
-The boundary conditions are simple: the boundaries of the region of interest
-	all are frictionless, which requires that the local fluid velocity
-	be parallel to the boundaries.
-For the splitter plate, the flows on the top and bottom of the splitter
-	plate have their velocities specified, while the flow should
-	extend indefinitely past the splitter plate.
-For the wake, the flow velocities of the flow input to the region of interest
-	are specified, while the flow should extend indefinitely further.
+The boundary conditions for our flows are different in the temporally-
+	evolving limit than they are in the rest frame.
+
+In the rest frame, for the splitter-plate, the boundary conditions are that
+	there is a no-slip condition at the splitter-plate.
+Before the splitter plate, on either side, there are inlet boundary
+	conditions with a fixed velocity.
+Below and above the splitter plate, the boundary conditions are that
+	infinitely below the splitter plate the velocity
+	assumes the value of the velocity in the lower inlet,
+	and infinitely above the splitter plate the velocity
+	assumes the value of the velocity in the upper inlet.
+There is no boundary condition far to the right of the region of interest,
+	i.e., it is an "exit" boundary condition.
+
+In the rest frame, for the wake, we assume that the object producing the
+	wake is not in the region of interest.
+We then have to the have the inlet boundary condition, to the left,
+	be the velocity profile downstream of an object.
+The upper and lower boundary conditions, at effective infinity, 
+	are that the velocity is the stream velocity.
+The right boundary conditions is an "exit" boundary condition.
+
+For the moving frames, where the spatial to temporal approximation is made,
+	the boundary conditions are similar but different.
+For both situations, uniformity in $x$ is assumed, so that we only
+	have to worry about variations in $y$.
+
+For the temporally-evolving splitter-plate case, our boundary condition
+	is, if the velocity deficit between the two streams is $2 U$,
+	the velocity at $y=-\infty$ is $-U$, and the velocity at
+	$y = \infty$ is $U$.
+
+For the temporally-evolving wake case, our boundary conditions is that
+	the velocity deficit goes to $0$ at both $y = -\infty$ and 
+	at $y=\infty$.
 
 \subsection{Mixing Layer Solution}
 
@@ -121,14 +152,14 @@ We can therefore assume that the fluid is identical in the $x$
 We assume that at time $t=0$, when the fluids just pass the splitter-plate,
 	the fluid above $y=0$ is all moving with velocity $U \hat{x}$,
 	and the fluid below $y=0$ is all moving with velocit $-U \hat{x}$.
-Since the velocities are small, as assumed before, we can neglect the
-	convective term, which is quadratic in velocity.
+Since the velocities are small, as assumed before, \emph{we can neglect the
+	convective term}, which is quadratic in velocity.
 Since the velocity we care about is the velocity in the $\hat{x}$ direction,
 	and we only see it varying along $y$, we can write this as 
 	$u(y)$ and consider only the diffusion of $u$ along $y$ over time:
 
 \begin{align}
-\frac{\partial u}{\partial t} & = \frac{\partial^2 u}{\partial y^2}
+\frac{\partial u}{\partial t} & = \nu \frac{\partial^2 u}{\partial y^2}
 \end{align}
 
 As for initial conditions, we assume that because of whatever physics
@@ -147,6 +178,7 @@ With this convention, $\mathcal{F} \left(\partial_y u(y)\right)
 	= 2\pi i \xi \hat{u}(\xi)$
 Thus, $\mathcal{F} \left(\partial_y^2 u(y)\right) 
 	= - 4 \pi^2 \xi^2 \hat{u}(\xi)$.
+
 We can now write the PDE, transformed to $\xi$-space, and its solution
 	for different values of $t$:
 
@@ -156,19 +188,36 @@ We can now write the PDE, transformed to $\xi$-space, and its solution
 \end{align}
 
 Since we know $u(x,0)$, we can find $\hat{u}(\xi, 0)$.
-The fourier transform of $\erf$ is $\frac{- i e^{-\pi^2 \xi^2}}{\pi \xi}$.
-Since the fourier transform of $f(a x)$ is simply $f(\xi/a)/a$,
-	the fourier transform of $U \erf \left( 
-	\frac{ \sqrt{\pi} y}{\delta } \right)$ is:
+Since we know the fourier transform of $f(a x)$ if we know the
+	fourier transform of $f(x)$, we can find the fourier
+	transform of $f(a x)$. 
 
 \begin{align}
-\hat{u}(\xi, 0) & = U
-	\frac{- i }{\pi \xi}\exp \left(-\pi \delta^2 \xi^2\right) \\
-\hat{u}(\xi, t) & = U \frac{- i}{\pi \xi} 
-	\exp\left(- \pi \xi^2 \left( \delta^2 + 4 \pi \nu t \right) \right)\\
-& = U \frac{- i}{\pi \xi} 
+\mathcal{F}(\erf(x))(\xi) & = 
+	\frac{-i}{\pi \xi} \exp \left(\pi^2 \xi^2 \right)\\
+\mathcal{F}(f(a x))(\xi) & = 
+	\frac{1}{a} \mathcal{F}(f(x))\left(\frac{\xi}{a}\right)\\
+\mathcal{F}(\erf(a x))(\xi) & =
+	\frac{-i}{\pi \xi} \exp \left(\pi^2 
+		\left( \frac{\xi}{a} \right)^2 \right)
+\end{align}
+
+Since $u(x,0) = U \erf \left( \frac{\sqrt{\pi}}{\delta} y \right) $,
+	the fourier transform of $u(x, 0)$ is:
+
+\begin{align}
+\hat{u}(\xi, 0) & = u
+	\frac{- i }{\pi \xi}\exp \left(-\pi^2 
+		\left( \frac{\xi}{\frac{\sqrt{\pi}}{\delta}} \right)^2 \right)\\
+\hat{u}(\xi, t) & = 
+	\exp \left( - 4 \pi^2 \xi^2 \nu t \right) \hat{u}(\xi, 0) \nonumber \\
+& = U
+	\frac{- i }{\pi \xi}\exp \left(-\pi^2 \xi^2 
+		\left( \frac{\delta^2}{\pi}
+		+ 4 \nu t \right) \right) \nonumber\\
+\hat{u}(\xi, t) &  = U \frac{- i}{\pi \xi} 
 	\exp\left(- \pi^2 \left( \frac{\xi}{\frac{\sqrt{\pi}}{
-	\sqrt{\delta^2 + 4 \pi \nu t}}} \right)^2 \right) \nonumber
+	\sqrt{\delta^2 + 4 \pi \nu t}}} \right)^2 \right)
 \end{align}
 
 We can do an inverse fourier transform, using the formula for the fourier
