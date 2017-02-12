@@ -2,8 +2,10 @@
 
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{pgfplots}
 
 \DeclareMathOperator\erf{erf}
+\DeclareMathOperator\Reynolds{Re}
 
 \begin{document}
 
@@ -295,6 +297,28 @@ b(t) & = \sqrt{ \frac{ \log 2}{\pi} \left( \delta^2 + 4 \pi \nu t \right) }
 
 In the case of no viscosity, $b = \delta \sqrt{\frac{\log 2}{\pi}}$
 
+\subsubsection{Interpretation as Position, Dimensionless Quantities}
+
+If we go back to the static reference frame, we can equate time and downstream
+	$x$ position via the identity $x = V t$, where $V$ is the free
+	stream velocity.
+We can thus transform $b(t)$ into $b(x)$ in the rest frame:
+
+\begin{align}
+b(x) & = \delta \sqrt{\frac{\log 2}{\pi}} \sqrt{1 + \frac{4 \pi \nu}{\delta^2 V} x}
+\end{align}
+
+We can make a substitution here: the Reynolds number $\Reynolds$ is given by
+	$\Reynolds = \frac{\delta V}{\nu}$, where $V$ is the velocity scale
+	and $\delta$ is the length scale.
+We can find the reyonlds number in the formula:
+
+\begin{align}
+b(x) & = \delta \sqrt{\frac{\log 2}{\pi}} 
+	\sqrt{1 + \frac{4 \pi}{\Reynolds} \frac{x}{\delta}}
+\end{align}
+
+\section{Parallelism}
 
 %question 4
 \section{ Nonuniform Mesh generation}
