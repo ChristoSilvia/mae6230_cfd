@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage{amsmath}
+\usepackage{graphicx}
 
 \DeclareMathOperator\erf{erf}
 
@@ -293,5 +294,109 @@ b(t) & = \sqrt{ \frac{ \log 2}{\pi} \left( \delta^2 + 4 \pi \nu t \right) }
 \end{align}
 
 In the case of no viscosity, $b = \delta \sqrt{\frac{\log 2}{\pi}}$
+
+
+%question 4
+\section{ Nonuniform Mesh generation}
+
+In this problem we generate a non-uniform 1D mesh consisting of $n$ cells between the locations $y_0$ and $y_n$. Cell $j$ is of size $\Delta y_j = y_j-y_{j-1}$, $ 1\leq j \leq n$, and cells are stretched according to $\dfrac{\Delta y_{j+1}}{\Delta y_j}  =\alpha$, where $\alpha$ is a user-provided parameter. To write a mesh-generating code, we note that 
+\[ y_j  = \Delta y_j + y_{j-1} = \sum_{k=1}^{j-1} \Delta y_k + y_0.\]
+Since $\Delta y_2 = \alpha \Delta y_1$, and in general $\Delta y_{j+1} = \alpha  \Delta y_{j}$, we have that $\Delta y_{j} = \alpha^{j-1} \Delta y_1$. This gives us the following formula for $y_j$:
+\[ y_j  = \Delta y_j + y_{j-1} = \sum_{k=1}^{j} \alpha^{-1} \Delta y_1 + y_0, \]
+which, when we sum the geometric series, can be written as 
+\begin{equation}
+\label{eq:yj}
+ y_j = \dfrac{\alpha^{j}-1}{\alpha -1} \Delta y_1 +y_0. 
+\end{equation}
+
+\subsection{Part (a)}
+Here we generate a mesh with $n=128$ using $ \alpha = 1.05$ between $y_0 = 0$ and $y_n = 1$.  We use~\eqref{eq:yj} with $(n, y_n) = (128, 1)$ to find that $ \Delta y_1 \approx 9.7181 \times 10^{-05} $.  
+
+Below we include images of the mesh. The 1D mesh described above was generated in the $y$-direction, and we used $128$ equispaced cells between $0$ and $10$ to generate a uniform grid in the $x$-direction. This makes the mesh easier to visualize. The image was generated in MATLAB using a variant of the mesh-generating code listed below in part (c).
+The left plot displays the entire mesh $y_0, y_1, \cdots y_{128}$. On the right we display only the first $50$ nodes of the mesh. 
+
+\vspace{1cm}
+
+\includegraphics[width=.45\textwidth]{meshgrid.jpg} 
+\includegraphics[width=.45\textwidth]{meshgrid_small.jpg} 
+
+\subsection{Part (b)}
+In this question, $n = 128$, $y_0 = 0$ and $y_n=1$. With $\delta_\omega = .176$, we'd like to find $\alpha$ such that $70\%$ of the grid points are concentrated between $y=0$ and $y=\delta_\omega$.  
+This means that we need $y_j \leq \delta_\omega$ for $j = \lceil.7n \rceil =  90$. We choose $y_{90} = \delta_\omega$ to achieve this. We can then find the unknowns $\alpha$ and $\Delta y_1$ by plugging the values for $j = n$ and $j = 90$ into~\eqref{eq:yj} and approximately solving the resulting system of equations:
+\begin{align}
+& \delta_\omega = \dfrac{\alpha^{90}-1}{\alpha -1} \Delta y_1 ,\\
+&  1 = \dfrac{\alpha^{128}-1}{\alpha -1} \Delta y_1 .
+\end{align}
+This requires an approximate solution to the equation
+\begin{equation} 
+\label{eq:chebeq}
+(\alpha^{128} -1) \delta_\omega = \alpha^{90}-1.
+\end{equation}
+We find that $\alpha \approx 1.045873956297$, and subsequently, $\Delta y_1 \approx 1.4777 \times 10^{-4}$. 
+We found this solution using Chebfun, a numerical computing program written in MATLAB. The Chebfun command {\tt roots} uses Chebyshev interpolants and colleague matrices to solve equations such as~\eqref{eq:chebeq} to a high degree of accuracy. Here is a printout of the Chebfun code we used: 
+\begin{verbatim}
+n = 128; 
+d = .176;
+
+%construct chebfuns representing eqns
+y1 = chebfun(@(x) x.^n-1, [1 1.2]); 
+y2 = chebfun(@(x) 1/(d)*(x.^(.7*n)-1), [1 1.2]); 
+
+% Chebfun finds two roots, we ignore the root r(1)=1. 
+r = roots(y1-y2);r = r(2); 
+
+%find delta y1
+dy1 = (r-1)./(r^n-1); 
+
+
+%check results
+j = ceil(.7*n); alpha = 1.05; d = 0.176;
+err1 = 1- dy1*(r^128-1)/(r-1)
+err2 = d- dy1*(r^(.7*128)-1)/(r-1)
+\end{verbatim}
+The errors, err1 and err2 are on the order of $10^{-15}$ and $10^{-10}$, respectively. 
+
+\subsection{Part (c)}
+Mesh generation code: We include the code in Fortran, as well as a variant used in MATLAB for visualization. 
+
+(add Fortran/C code here)
+
+\begin{verbatim}
+%build the mesh
+C = alpha_mesh(1.05, 0, 1, 128);
+
+%make it 2D for better visualization. 
+%this is with equispaced points in x-direction
+[xx, yy]=meshgrid(linspace(0,10,129), C);
+mesh(xx,yy, xx.*0+1)
+view(2)
+colormap(bone)
+export_fig -m2 -jpg -transparent 'meshgrid'
+
+%extract the first 50 entries
+[xx2, yy2] = meshgrid(linspace(0,10, 50), C(1:50)); 
+mesh(xx2, yy2, xx2.*0+1)
+view(2)
+colormap(bone)
+export_fig -m2 -jpg -transparent 'meshgrid_small'
+
+%..........subfunction alpha_mesh..............%
+
+%mesh generation
+% n = # cells, n+1 = # nodes
+function C = alpha_mesh(alpha, y0, yn, n)
+    
+%find Delta y1
+dy1 = (alpha-1)*(yn-y0)/(alpha^n-1);
+
+%construct mesh
+j = 1:(n-1);
+C = dy1*(alpha.^j-1)./(alpha-1)+y0; 
+C = [y0  C  yn];
+end
+\end{verbatim}
+
+
+
 
 \end{document}
