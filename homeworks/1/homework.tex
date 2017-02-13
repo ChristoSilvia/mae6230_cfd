@@ -325,7 +325,49 @@ b(x) & = \delta \sqrt{\frac{\log 2}{\pi}}
 	\sqrt{1 + \frac{4 \pi}{\Reynolds} \frac{x}{\delta}}
 \end{align}
 
+%question 3
 \section{Parallelism}
+
+\begin{itemize}
+ \item Parts (a) and (b). We installed the corresponding libraries in all of our machines.
+ 
+ \item Part (c). After running \textit{hello\_world.f90}, we succeded in getting the message
+ \begin{verbatim}
+ Hello, my processor rank is           0
+ \end{verbatim}
+ Then, we increased the number of processors and got a list showing the rank of all the processors. For example,
+ for \textit{-np 10}, the list was
+ \begin{verbatim}
+ Hello, my processor rank is           0
+ Hello, my processor rank is           1
+ Hello, my processor rank is           5
+ Hello, my processor rank is           6
+ Hello, my processor rank is           9
+ Hello, my processor rank is           7
+ Hello, my processor rank is           3
+ Hello, my processor rank is           4
+ Hello, my processor rank is           8
+ Hello, my processor rank is           2
+ \end{verbatim}
+ After trying larger numbers, we proved that we are able to execute more processors than any of our machines physically has.
+ 
+ \item Part (d) In order to explore the execution time and performance, we included the simple operation
+ \begin{equation}
+  a = \exp(5+0.001 b),
+ \end{equation}
+ where $b$ is a random number obtained at each iteration. As we increase the number of processors (\textit{np}), 
+ the execution time in any node decreases. For example, for $np = 1, \,2,\,3$, we obtain, respectively,
+ \begin{verbatim}
+ Hello, my processor rank is 0 of 1 Processors taking 2.30102539 seconds.
+ 
+ Hello, my processor rank is 0 of 2 Processors taking 1.89941406 seconds.
+ Hello, my processor rank is 1 of 2 Processors taking 1.91113281 seconds.
+ 
+ Hello, my processor rank is 2 of 3 Processors taking 0.790527344 seconds.
+ Hello, my processor rank is 1 of 3 Processors taking 0.792480469 seconds.
+ Hello, my processor rank is 0 of 3 Processors taking 0.793457031 seconds.
+ \end{verbatim}
+One thing we immediately notice is that the execution time varies in each node. We will come back to this later. 
 
 %question 4
 \section{ Nonuniform Mesh generation}
