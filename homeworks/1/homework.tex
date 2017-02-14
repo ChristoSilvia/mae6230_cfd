@@ -398,20 +398,20 @@ performed by any individual node to vary across different runs, even though the 
 \section{ Nonuniform Mesh generation}
 
 In this problem we generate a non-uniform 1D mesh consisting of $n$ cells between the locations $y_0$ and $y_n$. Cell $j$ is of size $\Delta y_j = y_j-y_{j-1}$, $ 1\leq j \leq n$, and cells are stretched according to $\dfrac{\Delta y_{j+1}}{\Delta y_j}  =\alpha$, where $\alpha$ is a user-provided parameter. To write a mesh-generating code, we note that 
-\[ y_j  = \Delta y_j + y_{j-1} = \sum_{k=1}^{j-1} \Delta y_k + y_0.\]
+\[ y_j  = \Delta y_j + y_{j-1} = \sum_{k=1}^{j} \Delta y_k + y_0.\]
 Since $\Delta y_2 = \alpha \Delta y_1$, and in general $\Delta y_{j+1} = \alpha  \Delta y_{j}$, we have that $\Delta y_{j} = \alpha^{j-1} \Delta y_1$. This gives us the following formula for $y_j$:
 \[ y_j  = \Delta y_j + y_{j-1} = \sum_{k=1}^{j} \alpha^{-1} \Delta y_1 + y_0, \]
-which, when we sum the geometric series, can be written as 
+which, if we assume $\alpha \not=1$ (the uniform case), when we sum the geometric series, can be written as 
 \begin{equation}
 \label{eq:yj}
  y_j = \dfrac{\alpha^{j}-1}{\alpha -1} \Delta y_1 +y_0. 
 \end{equation}
 
 \subsection{Part (a)}
-Here we generate a mesh with $n=128$ using $ \alpha = 1.05$ between $y_0 = 0$ and $y_n = 1$.  We use~\eqref{eq:yj} with $(n, y_n) = (128, 1)$ to find that $ \Delta y_1 \approx 9.7181 \times 10^{-05} $.  
+Here we generate a mesh with $n=128$ using $ \alpha = 1.05$ between $y_0 = 0$ and $y_n = 1$.  We use~\eqref{eq:yj} with $(j, y_j) = (128, 1)$ to find that $ \Delta y_1 \approx 9.7181 \times 10^{-05} $.  
 
-Below we include images of the mesh. The 1D mesh described above was generated in the $y$-direction, and we used $128$ equispaced cells between $0$ and $10$ to generate a uniform grid in the $x$-direction. This makes the mesh easier to visualize. The image was generated in MATLAB using a variant of the mesh-generating code listed below in part (c).
-The left plot displays the entire mesh $y_0, y_1, \cdots y_{128}$. On the right we display only the first $50$ nodes of the mesh. 
+Below we include images of the mesh. The 1D mesh described above was generated in the $y$-direction, and we used $128$ equispaced cells between $0$ and $10$ to generate a uniform grid in the $x$-direction. This makes the mesh easier to visualize. The image was generated in MATLAB using a variant of the  mesh-generating Fortran code listed below in part (c).
+The left plot displays the entire mesh: $y_0, y_1, \cdots,y_{128}$. On the right we display only the first $50$ nodes of the mesh. 
 
 \vspace{1cm}
 
@@ -457,7 +457,34 @@ The errors, err1 and err2 are on the order of $10^{-15}$ and $10^{-10}$, respect
 \subsection{Part (c)}
 Mesh generation code: We include the code in Fortran, as well as a variant used in MATLAB for visualization. 
 
-(add Fortran/C code here)
+
+\begin{verbatim}
+
+PROGRAM main
+IMPLICIT NONE
+INTEGER :: n, i
+REAL :: alpha, y0, yn, dy
+real, ALLOCATABLE :: bvec(:)
+
+WRITE(*,*) 'Input (alpha, n, y0, yn)'
+READ(*,*) alpha, n, y0, yn
+allocate ( bvec(0:n)   )
+
+dy = (alpha-1)*(yn-y0)/(alpha**n-1);
+
+bvec(0)=y0
+bvec(n)=yn
+
+do i=1,n-1
+  bvec(i)=dy*(alpha**i-1)/(alpha-1)+y0
+end do
+
+
+END PROGRAM main
+\end{verbatim}
+
+Here is the MATLAB code used for the visualization. 
+
 
 \begin{verbatim}
 %build the mesh
