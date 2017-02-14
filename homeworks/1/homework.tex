@@ -329,10 +329,10 @@ b(x) & = \delta \sqrt{\frac{\log 2}{\pi}}
 \section{Parallelism}
 
 \subsection{Parts (a) and (b)}
-We installed the corresponding libraries in our machines.
+We installed the corresponding libraries on our machines.
  
 \subsection{Part (c)} 
-After running \textit{hello\_world.f90}, we succeded in getting the message
+After running \textit{hello\_world.f90}, we succeeded in getting the message
 \begin{verbatim}
 Hello, my processor rank is           0
 \end{verbatim}
@@ -350,15 +350,17 @@ Hello, my processor rank is           4
 Hello, my processor rank is           8
 Hello, my processor rank is           2
 \end{verbatim}
-After trying larger numbers, we proved that we are able to execute more processors than any of our machines physically has.
+After trying larger numbers, we proved that we are able to execute more processors than any of 
+our machines physically has.
  
 \subsection{Part (d)}
 In order to explore the execution time and performance, we include the simple operation
 \begin{equation}
 a = \exp(5+0.001 b),
 \end{equation}
-where $b$ is a random number obtained at each iteration (see code below). As we increase the number of processors (\textit{np}), 
-the execution time in any node decreases. For example, for $np = 1, \,2,\,3$, we obtain, respectively,
+where $b$ is a random number obtained at each iteration. The number of iterations is $N/$\textit{np},
+with $N=10^8$. As we increase the number of processors (\textit{np}), 
+the execution time in each node decreases. For example, for $np = 1, \,2,\,3$, we obtain, respectively,
 \begin{verbatim}
 Hello, my processor rank is 0 of 1 Processors taking 2.30102539 seconds.
  
@@ -369,7 +371,27 @@ Hello, my processor rank is 2 of 3 Processors taking 0.790527344 seconds.
 Hello, my processor rank is 1 of 3 Processors taking 0.792480469 seconds.
 Hello, my processor rank is 0 of 3 Processors taking 0.793457031 seconds.
 \end{verbatim}
-One thing we immediately notice is that the execution time varies in each node. We will come back to this later. 
+One thing we immediately notice is that, for a given value of \textit{np}, the execution time
+varies in each node. We will come back to this later. 
+
+The figure below shows the execution time as a function of the number of processors. On our laptop, we are able to declare up
+to 199 processors before getting an error message. As expected, the execution time decreases as we declare more processors. 
+The points on the plot are relatively well described by the curve $f(\text{\textit{np}}) \propto 1/\text{\textit{np}}$ 
+(blue curve on the plot). This is consistent with the theoretical expectation that the time to perform a task would decrease
+by \textit{np} after dividing the task among \textit{np} processors. For large ($> 100$) \textit{np}, we note that the time
+ceases to decrease, and stays at a roughly constant (non-vanishing) value. Since assigning tasks to each processor takes 
+some finite time, we might interpret the constant value as this assignment time such that, for large \textit{np}, this 
+time dominates over the execution time in the node. We learn from this that parallelizing a program is convenient, 
+as long as the task of parallelizing itself does not take longer than running the program.
+
+When keeping all the parameters the same, we note some variations in the execution time of each processor across different
+runs, and among different processors during the same run. If the nodes were processing a single task and nothing else,
+we would expect the time to be equal across every node and for all of the runs. In reality, there are more
+(probably many) tasks being executed in the background, which affect the individual execution time of each processor.
+The bus is assigning jobs to nodes in the midst of and with respect to this variable CPU usage. This can cause the work
+performed by any individual node to vary across different runs, even though the parameters are the same.
+
+\includegraphics[width=1\textwidth]{t_vs_np.png}
 
 
 %question 4
