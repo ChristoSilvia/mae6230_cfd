@@ -15,6 +15,16 @@ We exhibit this polynomial below.
 p_i(x) & = \prod_{j \neq i} \frac{x - x_j}{x_i - x_j}
 \end{align}
 
+Note that $p_i(x_i) = \prod_{j \neq i} \frac{x_i - x_j}{x_i - x_j}$,
+	and since all of the numerators and denominators are equal,
+	we can see that $p_i(x_i) = 1$.
+For $p_i(x_k) = \prod_{j \neq i} \frac{x_k - x_j}{x_i - x_j}$,
+	if $k \neq i$, since $j$ ranges over all indices except $i$,
+	one of the $j$'s will be equal to $k$.
+That will make the numerator zero, and thus the whole product
+	will be zero.
+Therefore, $p_i(x_k) = \delta_{ik}$.
+
 If we want our polynomial to have the value $f(x_i)$ at each
 	point $x_i$, we can sum several of these polynomials, so that
 	the resultant polynomial has the characteristics which we desire:
@@ -25,5 +35,7 @@ p(x) & = \sum_i f(x_i)
 \end{align}
 
 This polynomial has the required values at each point.
+
+\section{Differentiating a Lagrange Interpolating Polynomial}
 
 \end{document}
