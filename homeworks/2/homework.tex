@@ -12,32 +12,76 @@ We are trying to write a polynomial which, if we are considering
 We exhibit this polynomial below.
 
 \begin{align}
-p_i(x) & = \prod_{j \neq i} \frac{x - x_j}{x_i - x_j}
+f_i(x) & = \prod_{j \neq i} \frac{x - x_j}{x_i - x_j}
 \end{align}
 
-Note that $p_i(x_i) = \prod_{j \neq i} \frac{x_i - x_j}{x_i - x_j}$,
+Note that $f_i(x_i) = \prod_{j \neq i} \frac{x_i - x_j}{x_i - x_j}$,
 	and since all of the numerators and denominators are equal,
-	we can see that $p_i(x_i) = 1$.
-For $p_i(x_k) = \prod_{j \neq i} \frac{x_k - x_j}{x_i - x_j}$,
+	we can see that $f_i(x_i) = 1$.
+For $f_i(x_k) = \prod_{j \neq i} \frac{x_k - x_j}{x_i - x_j}$,
 	if $k \neq i$, since $j$ ranges over all indices except $i$,
 	one of the $j$'s will be equal to $k$.
 That will make the numerator zero, and thus the whole product
 	will be zero.
-Therefore, $p_i(x_k) = \delta_{ik}$.
+Therefore, $f_i(x_k) = \delta_{ik}$.
 
-If we want our polynomial to have the value $f(x_i)$ at each
+If we want our polynomial to have the value $y_i$ at each
 	point $x_i$, we can sum several of these polynomials, so that
 	the resultant polynomial has the characteristics which we desire:
 
 \begin{align}
-p(x) & = \sum_i f(x_i) p_i(x) \\
-& = \sum_i f(x_i) 
+f(x) & = \sum_i y_i f_i(x) \\
+& = \sum_i y_i 
 	\left( \prod_{j \neq i} \frac{x-x_j}{x_i-x_j} \right)
 \end{align}
 
 This polynomial has the required values at each point.
 
 \section{Differentiating a Lagrange Interpolating Polynomial}
+
+Given the definition of $f_i(x)$ given above, we can compute
+	the derivative of $f_i(x)$ with respect to $x$.
+
+\begin{align}
+\frac{d f_i(x)}{dx} & = \sum_{\begin{matrix}k=0\\k\neq i\end{matrix}}^n 
+	\frac{1}{x_i - x_k}
+	\left( \prod_{
+		\begin{matrix} j = 0 \\ j \neq k\\j \neq i \end{matrix}}^{j=n}
+		\frac{x - x_j}{x_i - x_j} \right)
+\end{align}
+
+Therefore, for the whole approximating function $f(x)$, we have:
+
+\begin{align}
+\frac{df}{dx}(x) & = \sum_{\begin{matrix}i=0\end{matrix}}^n
+	y_i
+	\sum_{\begin{matrix}k=0\\k\neq i\end{matrix}}^n
+	\frac{1}{x_i - x_k}
+	\left( \prod_{
+		\begin{matrix} j = 0 \\ j \neq k\\j \neq i \end{matrix}}^{j=n}
+		\frac{x - x_j}{x_i - x_j} \right)
+\end{align}
+
+This can be interpeted as a dot product.
+If we consider the vector $\vec{D}(x)$ given by:
+
+\begin{align}
+D_i(x) & = 
+	\sum_{\begin{matrix}k=0\\k\neq i\end{matrix}}^n
+	\frac{1}{x_i - x_k}
+	\left( \prod_{
+		\begin{matrix} j = 0 \\ j \neq k\\j \neq i \end{matrix}}^{j=n}
+		\frac{x - x_j}{x_i - x_j} \right)
+\end{align}
+
+Then if we consider the vector $\vec{y} = \{ y_0, \dots, y_n \}$,
+	then $\frac{df}{dx}(x) = \vec{D}(x) \cdot \vec{y}$.
+
+\section{Placeholder Title for Problem 3}
+
+\section{Placeholder Title for Problem 4}
+
+\section{Computation of mesh}
 
 
 
