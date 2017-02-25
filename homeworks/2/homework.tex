@@ -66,7 +66,7 @@ This can be interpeted as a dot product.
 If we consider the vector $\vec{D}(x)$ given by:
 
 \begin{align}
-D_i(x) & = 
+D_i(x_l) & = 
 	\sum_{\begin{matrix}k=0\\k\neq i\end{matrix}}^n
 	\frac{1}{x_i - x_k}
 	\left( \prod_{
@@ -77,7 +77,8 @@ D_i(x) & =
 Then if we consider the vector $\vec{y} = \{ y_0, \dots, y_n \}$,
 	then $\frac{df}{dx}(x) = \vec{D}(x) \cdot \vec{y}$.
 
-There's a special case to this.  
+\subsection{Computing the Derivative at the Stencil Points $x_0, \dots x_n$}
+  
 Suppose $x = x_l$ is one of the coordinates.
 Then, $D_i(x_l)$ is given by:
 
