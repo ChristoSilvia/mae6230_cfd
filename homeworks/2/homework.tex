@@ -77,6 +77,35 @@ D_i(x) & =
 Then if we consider the vector $\vec{y} = \{ y_0, \dots, y_n \}$,
 	then $\frac{df}{dx}(x) = \vec{D}(x) \cdot \vec{y}$.
 
+There's a special case to this.  
+Suppose $x = x_l$ is one of the coordinates.
+Then, $D_i(x_l)$ is given by:
+
+\begin{align}
+D_i(x_l) & = 
+	\sum_{\begin{matrix}k=0\\k\neq i\end{matrix}}^n
+	\frac{1}{x_i - x_k}
+	\left( \prod_{
+		\begin{matrix} j = 0 \\ j \neq k\\j \neq i \end{matrix}}^{j=n}
+		\frac{x_l - x_j}{x_i - x_j} \right)
+\end{align}
+
+However, this can be greatly simplified.
+If $x_l = x_i$, then we see that the product terms all drop out,
+	since the numerators and denomiators are all equal.
+If $x_l \neq x_i$, then the product would only be nonzero for the
+	case where $k=l$.
+Therefore, only that term in the sum survives.
+We show the special cases for $D_i(x_l)$ below:
+
+\begin{align}
+D_i(x_i) & = \sum_{\begin{matrix}k=0\\k\neq i\end{matrix}} \frac{1}{x_i - x_k}\\
+\begin{matrix}D_i(x_l)\\l \neq i\end{matrix} & = \frac{1}{x_i - x_l} 
+	\prod_{
+		\begin{matrix} j = 0 \\ j \neq l\\j \neq i \end{matrix}}^{j=n}
+		\frac{x_l - x_j}{x_i - x_j} 
+\end{align}
+
 \section{Placeholder Title for Problem 3}
 
 \section{Placeholder Title for Problem 4}
