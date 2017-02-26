@@ -12,64 +12,22 @@ const double PI = 4*atan(1.);
     xs = array of locations of stencil points
     D = array to save coefficients
 */
-void dfdx(double x, int ns, double *xs, double *D)
-{
-    /* PRINT xs
-    for(int k=0; k<ns; k++)
-        cout << xs[k] << " ";
-    cout << endl; */
-
-    // Since the finite diff coefficients depend on the differences (xs[l]-xs[m]),
-    // we generate an auxiliar matrix "dx" containing these differences.
-    double** dxs = new double*[ns];
-    for(int l=0; l<ns; l++)
-    {
-        dxs[l] = new double[ns];
-        for(int m=0; m<ns; m++)
-            dxs[l][m] = xs[l] - xs[m];
-    }
-    /* PRINT dxs
-    for(int l=0; l<ns; l++)
-    {
-        for(int m=0; m<ns; m++)
-            cout << dxs[l][m] << " ";
-        cout << endl;
-    }
-    cout << endl; */
-
-
-    // For the k-th stencil point, calculate its coefficient and store it in D[k].
-
-    double aux;// auxiliar variable to store the inner product in dfk/dx (Eq. 4)
-    for(int k=0; k<ns; k++)
-    {
-        D[k] = 0;
-        for(int l=0; l<ns; l++)
-            if(l!=k)
-            {
-                aux = 1;
-                for(int m=0; m<ns; m++)
-                {
-                    if(m!=k && m!=l)
-                        aux = aux*(x - xs[m])/dxs[k][m];
-                }
-                aux = aux/dxs[k][l];
-                D[k] = D[k] + aux;
+void dfdx(double x, int ns, double *xs, double *D){
+    // For the k-th stencil point, calculate its 
+    //     coefficient and store it in D[k].
+    double aux;
+    for(int i=0; i<ns; i++){
+        D[i] = 0;
+        for(int k=0; k<ns; k++){
+            aux = 1/(xs[i]-xs[k]);
+            for(int j=0; j<ns; m++){
+                if(j!=i && j!=k)
+                    aux *= (x - xs[j])/(xs[i] - xs[j]);
             }
+            D[k] += aux;
+        }
     }
-
-    /* PRINT D[k]
-    for(int k=0; k<ns; k++)
-        cout << D[k] << " ";
-    cout << endl; */
-
-
-    // Release memory allocated for dxs
-    for(int l=0; l<ns; l++)
-        delete[] dxs[l];
-    delete[] dxs;
 }
-
 
 /*  FUNCTION: Mesh generator.
 
