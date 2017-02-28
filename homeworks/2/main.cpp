@@ -60,12 +60,7 @@ int main()
     int n = 30;
     double *x = new double[n+1];
     mesh(n, x);
-    /* PRINT x
-    for(int i=0; i<=n; i++)
-        cout << x[i] << endl;
-    cout << endl; */
-
-
+    
     // Generate the coefficients at each point on the mesh using a stencil of ns locations.
     // End points without enough info to calculate the derivative must be excluded.
     int ns = 5;
@@ -75,22 +70,10 @@ int main()
         double* xs = new double[ns];
         for(int l=0; l<ns; l++)
             xs[l] = x[i-ns/2+l];
-        // Passing a new matrix makes notation in dfdx() coincide with that on the pdf.
-
-        /* PRINT stencil locations (this should coincide with xs in dfdx() )
-        for(int l=0; l<ns; l++)
-            cout << xs[l] << " ";
-        cout << endl; */
-
+        
         // Compute the ns derivative coeffs at x[i] and save them in temp array D.
         double *D = new double[ns];
         dfdx(x[i], ns, xs, D);
-
-        /* Print finite diff coeffs (this should coincide with D in dfdx() )
-        for(int k=0; k<ns; k++)
-            cout << D[k] << " ";
-        cout << endl; */
-
 
         // With the coefficients obtained, compute the approximation for f(x_i) (Eq. 6)
         double dfnumdx = 0;
