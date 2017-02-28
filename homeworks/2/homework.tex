@@ -12,7 +12,7 @@
 
 \maketitle
 
-\section{Organization}
+\section*{Organization}
 
 We met and derived the formulas for P1 and P2. Christopher wrote the solution to these problems.
 We then started a new Github repo to write and co-edit the code for the finite differene coefficients
@@ -157,15 +157,41 @@ void dfdx(double x, int ns, double *xs, double *D){
 
 \section{Formal Accuracy of Finite Difference Scheme}
 
-Given a stencil, which is a series of points $x_0, \dots, x_n$, 
+Given an $n$-point stencil, which is a series of points 
+	$x_0, \dots, x_n$, 
 	and a point at which the derivative is to be computed,
 	$x$, we compute coefficients which can be used to compute
 	the derivative at $x$ based on the values of the function
-	at the points $x_0, \dots, x_n$.
-The scheme comes from the differentiation of an interpolating polynomial
-	of order $n-1$.
-The difference between the actual derivative, and the approximating
-	polynomial, is a polynomial of order $n$.
+	$f$ at the points $x_0, \dots, x_n$.
+
+This is done by deriving an expression to find a polynomial
+	which interpolates all $n$ points, assuming that we know
+	the value of $f$ at each point..
+This polynomial is thus of order $n-1$.
+The polynomial is derived from a taylor series, which 
+	necessarily contains factors of the separation between
+	points, $dx$.
+
+The derivative of the interpolating polynomial is of order
+	$n-2$.
+If we consider the polynomial of infinite order which perfectly
+	matches $f'$, given that we have a polynomial approximation
+	of order $n-2$, and assuming that the successively
+	higher powers of $dx$ make the lowest order polynomial
+	term dominant, the difference between $f'$ and the interpolating
+	derivative polynomial of order $n-2$ is a polynomial of 
+	order $n-1$.
+In summary, our approximated derivative matches all the polynomial
+	coefficients up to $n-2$, leaving $n-1$ the largest
+	contribution to the error.
+
+Since the polynomial of order $n-1$ comes with factors of 
+	the separation $dx$, the error \emph{at each point}
+	is proportional to $dx^{n-1}$.
+
+For example, with a 5th order method, the expected error 
+	at each point should decrease 4 db/dec.
+
 
 \section{Computation of mesh}
 
@@ -182,6 +208,7 @@ This stencil varies spatially, as the point distribution changes.
 
 Using the function $f(x) = \tanh ( 10 x - 5 )$, we compare the analytical
 	derivative with the numerical derivative.
+The code which produced this figure is given in Appendix A.
 
 \includegraphics[width=\textwidth]{ErrorDecrease.png}
 
@@ -190,9 +217,19 @@ For some reason, the $L$-$1$ error has a slope of 3,
 	and the $L$-$\infty$ error has a slope of 4.
 This result surprised us, and we aren't quite sure why the errors
 	decrease in this way.
+
 If every individual point's error is decreased in the 4th order
 	of the mean point separation, then this accounts for the
 	$L$-$\infty$ error's slope.
+
+If every individual point's error is decreased by the 4th power
+	of the mean separation, but there are more points as the inverse
+	1st power of the mean separation, then the total $L$-$1$ error
+	may decrease as the third power of the separation, as the product
+	of these two.
+
+I am still unsure why the $L$-$2$ error decreased by the 3.5th
+	power of the mean separation.
 
 \subsection{Boundaries of the Mesh}
 
