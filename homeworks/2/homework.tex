@@ -1,6 +1,9 @@
 \documentclass{article}
 
 \usepackage{amsmath}
+\usepackage{listings}
+\usepackage{graphicx}
+
 
 \begin{document}
 
@@ -107,12 +110,108 @@ D_i(x_i) & = \sum_{\begin{matrix}k=0\\k\neq i\end{matrix}} \frac{1}{x_i - x_k}\\
 		\frac{x_l - x_j}{x_i - x_j} 
 \end{align}
 
-\section{Placeholder Title for Problem 3}
+\section{Finite Difference Scheme Code}
 
-\section{Placeholder Title for Problem 4}
+The code snippet below implements a stencil to compute the derivative
+	at an arbitrary point $x$.
+
+\lstset{language=C++}
+\begin{lstlisting}
+/*  FUNCTION: 1st derivative of f(x).
+    Given a stencil, it generates the finite diff coefficients
+
+    x = point at which dfdx is evaluated
+    ns = number of points on the stencil
+    xs = array of locations of stencil points
+    D = array to save coefficients
+*/
+void dfdx(double x, int ns, double *xs, double *D){
+    // For the k-th stencil point, calculate its 
+    //     coefficient and store it in D[k].
+    double aux;
+    for(int i=0; i<ns; i++){
+        D[i] = 0;
+        for(int k=0; k<ns; k++){
+            aux = 1/(xs[i]-xs[k]);
+            for(int j=0; j<ns; m++){
+                if(j!=i && j!=k)
+                    aux *= (x - xs[j])/(xs[i] - xs[j]);
+            }
+            D[k] += aux;
+        }
+    }
+}
+\end{lstlisting}
+
+\section{Formal Accuracy of Finite Difference Scheme}
+
+Given a stencil, which is a series of points $x_0, \dots, x_n$, 
+	and a point at which the derivative is to be computed,
+	$x$, we compute coefficients which can be used to compute
+	the derivative at $x$ based on the values of the function
+	at the points $x_0, \dots, x_n$.
+The scheme comes from the differentiation of an interpolating polynomial
+	of order $n-1$.
+The difference between the actual derivative, and the approximating
+	polynomial, is a polynomial of order $n$.
 
 \section{Computation of mesh}
 
+In this section, we consider a mesh in which the point $x_i$, 
+	$i$ ranging from $0$ to $n$, the points are distributed as:
 
+\begin{align}
+x_i & = \frac{i}{n} + \frac{1}{10} \sin \left( \frac{2 \pi i}{n} \right)
+\end{align}
+
+We are using our finite-difference scheme code to generate a five-point
+	computational stencil.
+This stencil varies spatially, as the point distribution changes.
+
+Using the function $f(x) = \tanh ( 10 x - 5 )$, we compare the analytical
+	derivative with the numerical derivative.
+
+\includegraphics[width=\textwidth]{ErrorDecrease.png}
+
+For some reason, the $L$-$1$ error has a slope of 3,
+	the $L$-$2$ error has a slope of 3.5,
+	and the $L$-$\infty$ error has a slope of 4.
+This result surprised us, and we aren't quite sure why the errors
+	decrease in this way.
+If every individual point's error is decreased in the 4th order
+	of the mean point separation, then this accounts for the
+	$L$-$\infty$ error's slope.
+
+\subsection{Boundaries of the Mesh}
+
+The computation above was performed only on the interior points,
+	with at least two neighbors.
+We referred earlier to the $D$ matrix, where $D_{ij} = D_i(x_j)$.
+This was done by computing the full $D$ matrix for a 5-point stencil,
+	and then selecting the row corresponding to the center point.
+In order to compute the derivatives on the boundary, one need only select
+	the row corresponding to the boundary point.
+This is a 4th order method throughout the simulation region.
+
+However, this is not necessarily what we might want.
+If we want to preserve the pentadiagonal structure, the first row
+	and last row can only contain three nonzero entries.
+Similarly, the second and second-to-last rows can only contain four
+	nonzero entries.
+The solution is to make a $D$ matrix for the first three (or four)
+	points, and then select the row corresponding to the relevant point.
+While this preserves the diagonal structure of the matrix, this is not
+	a  4th order matrix all throughout the simulation region.
+
+The final way to compute the boundaries is if we perscribe the values 
+	of the function past the boundary of the simulation region,
+	or if we perscribe the value of the function and the derivative
+	at the boundary, we can preserve the 5th order character
+	of the method, as well as the pentadiagonal structure.
+
+\appendix
+\section{Code Appendix}
+\lstset{language=python}
+\lstinputlisting{make_err.py}
 
 \end{document}
