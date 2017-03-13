@@ -102,12 +102,12 @@ int main()
 
     // Give initial values to start the simulation
     setInitialConditions(rho, u, v, rhou, rhov);
-    filename = "data/data_" + ZeroPadNumber(0) + ".csv";
-    data.open(filename.c_str());
-    for(int i = 0; i < nx; i++)
-        for(int j = 0; j < ny; j++)
-            data << x[i] << "\t" << y[j] << "\t" << rho[ind(i, j)] << "\t" << u[ind(i, j)] << "\t" << v[ind(i, j)] << "\n";
-    data.close();
+    //filename = "data/data_" + ZeroPadNumber(0) + ".csv";
+    //data.open(filename.c_str());
+    //for(int i = 0; i < nx; i++)
+    //    for(int j = 0; j < ny; j++)
+    //        data << x[i] << "\t" << y[j] << "\t" << rho[ind(i, j)] << "\t" << u[ind(i, j)] << "\t" << v[ind(i, j)] << "\n";
+    //data.close();
 
     // Start simulation
     int nt = 3; /** This number should be chosen so that the flow does not change anymore **/
@@ -303,12 +303,12 @@ int main()
         }
         cout << endl;
 
-        filename = "data/data_" + ZeroPadNumber(n) + ".csv";
-        data.open(filename.c_str());
-        for(int i = 0; i < nx; i++)
-            for(int j = 0; j < ny; j++)
-                data << x[i] << "\t" << y[j] << "\t" << rho[ind(i, j)] << "\t" << u[ind(i, j)] << "\t" << v[ind(i, j)] << "\n";
-        data.close();
+        //filename = "data/data_" + ZeroPadNumber(n) + ".csv";
+        //data.open(filename.c_str());
+        //for(int i = 0; i < nx; i++)
+        //    for(int j = 0; j < ny; j++)
+        //        data << x[i] << "\t" << y[j] << "\t" << rho[ind(i, j)] << "\t" << u[ind(i, j)] << "\t" << v[ind(i, j)] << "\n";
+        //data.close();
     }
 
     // Release heap memory...
