@@ -58,8 +58,8 @@ int main()
     rho0 = 1.;
     H = 1.0;
 
-    double dx = H/nx;
-    double dy = H/ny;
+    double dx = H/(nx-1);
+    double dy = H/(ny-1);
     double *x = new double[nx];
     double *y = new double[ny];
 
