@@ -94,7 +94,7 @@ int main()
             {
                 rhos[ind(i, j)] = rho[ind(i, j)];// formulas in construction
                 rhous[ind(i, j)] = rhou[ind(i, j)];
-                rhovs[ind(i, j)] = rhov[in(i, j)];
+                rhovs[ind(i, j)] = rhov[ind(i, j)];
             }
         }
 
