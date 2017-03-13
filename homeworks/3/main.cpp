@@ -111,7 +111,8 @@ int main()
 
     // Start simulation
     int nt = 3; /** This number should be chosen so that the flow does not change anymore **/
-    double dt = 0.001; /** This should obey some stability criterion **/
+    double sigma = 0.5;
+    double dt = sigma/( (U/dx) + (U/dy) + (1/Ma)*sqrt( pow(dx,-2) + pow(dy,-2) ) )/( 1. + 2.*Re*Ma*min(dx,dy) );
 
     double a1 = dt/dx;
     double a2 = dt/dy;
