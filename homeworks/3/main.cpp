@@ -90,10 +90,10 @@ int main()
         // From the initial conditions, compute the predictor for the interior points
         for(int i = 1; i < nx-1; i++)
         {
-            for(int j = 1; j < nx-1; j++)
+            for(int j = 1; j < ny-1; j++)
             {
                 rhos[ind(i, j)] = rho[ind(i, j)];// formulas in construction
-                rhous[ind(i, j)] = rhos[ind(i, j)];
+                rhous[ind(i, j)] = rhou[ind(i, j)];
                 rhovs[ind(i, j)] = rhov[in(i, j)];
             }
         }
