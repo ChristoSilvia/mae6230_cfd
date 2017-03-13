@@ -78,12 +78,12 @@ int main()
     // Start simulation
     int nt = 100; /* This number should be chosen so that the flow does not change anymore */
 
-    // Memory to save the predictor step (star variables)
-    double *rhos = new double[N];
-    double *us = new double[N];
-    double *vs = new double[N];
-    double *rhous = new double[N];
-    double *rhovs = new double[N];
+    // Memory to save the predictor step (star variables) (p for predictor)
+    double *rhop = new double[N];
+    double *up = new double[N];
+    double *vp = new double[N];
+    double *rhoup = new double[N];
+    double *rhovp = new double[N];
 
     for(int n = 0; n < nt; n++)
     {
@@ -92,9 +92,9 @@ int main()
         {
             for(int j = 1; j < ny-1; j++)
             {
-                rhos[ind(i, j)] = rho[ind(i, j)];// formulas in construction
-                rhous[ind(i, j)] = rhos[ind(i, j)];
-                rhovs[ind(i, j)] = rhov[ind(i, j)];
+                rhop[ind(i, j)] = rho[ind(i, j)];// formulas in construction
+                rhoup[ind(i, j)] = rhou[ind(i, j)];
+                rhovp[ind(i, j)] = rhov[ind(i, j)];
             }
         }
 
@@ -117,11 +117,11 @@ int main()
     delete[] v;
     delete[] rhou;
     delete[] rhov;
-    delete[] rhos;
-    delete[] us;
-    delete[] vs;
-    delete[] rhous;
-    delete[] rhovs;
+    delete[] rhop;
+    delete[] up;
+    delete[] vp;
+    delete[] rhoup;
+    delete[] rhovp;
 
     // ... and exit program.
     return 0;
