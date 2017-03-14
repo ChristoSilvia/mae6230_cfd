@@ -1,4 +1,4 @@
-\title{Homework 3: setup}
+\title{Homework 3}
 \author{Crist\'obal Armaza, Chris Silvia}
 \date{\today}
 
@@ -25,7 +25,6 @@
 
 \begin{document}
 \maketitle
-
 
 \section{Analytical Equations}
 
@@ -195,7 +194,7 @@ for $i = 1,\hdots,n_x-2$. For the top, $u = U$ so $\partial(\rho u)/\partial x =
 &\quad- \frac{a_2}{4}\left[ \ind{(\rho v)}{\star}{i}{n_y - 3} - 4\ind{(\rho v)}{\star}{i}{n_y - 2} + 3\ind{(\rho v)}{\star}{i}{n_y-1} \right],
 \end{align}
 for $i = 1,\hdots,(n_x-2)$. Note that for $\partial\rho/\partial x$ we use a central stencil, which is also second-order accurate. Finally, for each corner, one notes that there are two available formulas provided by the above conditions.
-We simple take the average of both options.
+We simple take the left and right options for each pair of corners, respectively.
 
 \subsection{System Ready to Be Solved!}
 
