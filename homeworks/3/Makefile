@@ -1,2 +1,2 @@
 make:
-	g++ cfd.cpp -o cfd
+	g++ cfd3.cpp -o cfd3
