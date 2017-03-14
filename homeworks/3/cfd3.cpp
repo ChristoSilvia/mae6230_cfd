@@ -14,9 +14,9 @@ int ind(int i, int j) {
 	return nx*j + i;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 	// Number of Timesteps
-	int nsteps = 100000;
+	int nsteps = 400000;
 
 	// Mesh Parameters
 	nx = 256;
@@ -90,9 +90,25 @@ int main() {
 				v[ind(i,j)] = rho_v[ind(i,j)]/rho[ind(i,j)];	
 			}
 		}
+
+
+		// Bottom Boundary
+		for(int i=1; i<nx-1; i++){
+			// Bottom Boundary
+			rho_p[ind(i,0)] = rho[ind(i,0)]
+					- b2*(	-3*rho_v[ind(i,0)]
+						+4*rho_v[ind(i,1)]
+						-1*rho_v[ind(i,2)]);
+		}	
 	
 		// Interior First
 		for(int j=1; j<ny-1; j++){
+			// Left Boundary
+			rho_p[ind(0,j)] = rho[ind(0,j)] 
+					- b1*(	-3*rho_u[ind(0,j)]
+						+4*rho_u[ind(1,j)]
+						-1*rho_u[ind(2,j)]);
+
 			for(int i=1; i<nx-1; i++){
 
 				// Mass equation
@@ -150,16 +166,6 @@ int main() {
 					- u[ind(i+1,j-1)]
 					- u[ind(i-1,j+1)] );
 			}
-		}
-
-
-		// Vertical Boundaries
-		for(int j =1; j<ny-1; j++){
-			// Left Boundary
-			rho_p[ind(0,j)] = rho[ind(0,j)] 
-					- b1*(	-3*rho_u[ind(0,j)]
-						+4*rho_u[ind(1,j)]
-						-1*rho_u[ind(2,j)]);
 			// Right Boundary
 			rho_p[ind(nx-1,j)] = rho[ind(nx-1,j)]
 					+ b1*(	-3*rho_u[ind(nx-1,j)]
@@ -167,14 +173,9 @@ int main() {
 						-1*rho_u[ind(nx-3,j)]);
 		}
 
-		// Horizontal Boundaries
+
+		// Top Boundary
 		for(int i=1; i<nx-1; i++){
-			// Bottom Boundary
-			rho_p[ind(i,0)] = rho[ind(i,0)]
-					- b2*(	-3*rho_v[ind(i,0)]
-						+4*rho_v[ind(i,1)]
-						-1*rho_v[ind(i,2)]);
-			// Top Boundary
 			rho_p[ind(i,ny-1)] = rho[ind(i,ny-1)]
 					+ b2*(	-3*rho_v[ind(i,ny-1)]
 						+4*rho_v[ind(i,ny-2)]
@@ -183,35 +184,6 @@ int main() {
 						-rho[ind(i-1,ny-1)]);
 			rho_u_p[ind(i,ny-1)] = U*rho_p[ind(i,ny-1)];
 		}
-		/*
-		// Corners
-		// Top Left Corner
-		rho_p[ind(0,ny-1)] = rho[ind(0,ny-1)]
-				- b1*U*(-3*rho[ind(0,ny-1)]
-					+4*rho[ind(1,ny-1)]
-					-1*rho[ind(2,ny-1)]);
-		rho_u_p[ind(0,ny-1)] = U*rho_p[ind(0,ny-1)];
-		// Top Right Coner
-		rho_p[ind(nx-1,ny-1)] = rho[ind(nx-1,ny-1)]
-				+ b1*U*(-3*rho[ind(nx-1,ny-1)]
-					+4*rho[ind(nx-2,ny-1)]
-					-1*rho[ind(nx-3,ny-1)]);
-		rho_u_p[ind(nx-1,ny-1)] = U*rho_p[ind(nx-1,ny-1)];
-		*/	
-		/*
-		ofstream rho_p_csv;
-		char rho_p_buffer[20];
-		sprintf(rho_p_buffer, "rho_p/rho_p_%04d.csv", step_index);
-		rho_p_csv.open(rho_p_buffer);
-		
-		for(int j=0; j<ny; j++){
-			for(int i=0; i<nx-1; i++){
-				rho_p_csv << rho_p[ind(i,j)] << ",";
-			}
-			rho_p_csv << rho_p[ind(nx-1,j)] << "\n";
-		}
-		rho_p_csv.close();
-		*/
 	
 		//////////////////////////////////////////////////////
 		// CORRECTOR	
@@ -223,9 +195,22 @@ int main() {
 				v[ind(i,j)] = rho_v_p[ind(i,j)]/rho_p[ind(i,j)];	
 			}
 		}
+		
+		for(int i=1; i<nx-1; i++){
+			// Bottom Boundary
+			rho[ind(i,0)] = 0.5*(rho[ind(i,0)] + rho_p[ind(i,0)]
+					- b2*(	-3*rho_v_p[ind(i,0)]
+						+4*rho_v_p[ind(i,1)]
+						-1*rho_v_p[ind(i,2)]));
+		}
 	
 		// Interior First
 		for(int j=1; j<ny-1; j++){
+			// Left Boundary
+			rho[ind(0,j)] = 0.5*(rho[ind(0,j)] + rho_p[ind(0,j)]
+					- b1*(	-3*rho_u_p[ind(0,j)]
+						+4*rho_u_p[ind(1,j)]
+						-1*rho_u_p[ind(2,j)]));
 			for(int i=1; i<nx-1; i++){
 
 				// Mass Equation
@@ -286,16 +271,6 @@ int main() {
 					- u[ind(i+1,j-1)]
 					- u[ind(i-1,j+1)] ));
 			}
-		}
-
-
-		// Vertical Boundaries
-		for(int j =1; j<ny-1; j++){
-			// Left Boundary
-			rho[ind(0,j)] = 0.5*(rho[ind(0,j)] + rho_p[ind(0,j)]
-					- b1*(	-3*rho_u_p[ind(0,j)]
-						+4*rho_u_p[ind(1,j)]
-						-1*rho_u_p[ind(2,j)]));
 			// Right Boundary
 			rho[ind(nx-1,j)] = 0.5*(rho[ind(nx-1,j)] + rho_p[ind(nx-1,j)]
 					+ b1*(	-3*rho_u_p[ind(nx-1,j)]
@@ -303,14 +278,8 @@ int main() {
 						-1*rho_u_p[ind(nx-3,j)]));
 		}
 
-		// Horizontal Boundaries
+		// Top Boundary
 		for(int i=1; i<nx-1; i++){
-			// Bottom Boundary
-			rho[ind(i,0)] = 0.5*(rho[ind(i,0)] + rho_p[ind(i,0)]
-					- b2*(	-3*rho_v_p[ind(i,0)]
-						+4*rho_v_p[ind(i,1)]
-						-1*rho_v_p[ind(i,2)]));
-			// Top Boundary
 			rho[ind(i,ny-1)] = 0.5*(rho[ind(i,ny-1)] + rho_p[ind(i,ny-1)]
 					+ b2*(	-3*rho_v[ind(i,ny-1)]
 						+4*rho_v[ind(i,ny-2)]
@@ -321,20 +290,6 @@ int main() {
 		}
 
 		/*
-		// Corners
-		// Top Left Corner
-		rho[ind(0,ny-1)] = 0.5*(rho[ind(0,ny-1)] + rho_p[ind(0,ny-1)]
-				- b1*U*(-3*rho[ind(0,ny-1)]
-					+4*rho[ind(1,ny-1)]
-					-1*rho[ind(2,ny-1)]));
-		rho_u[ind(0,ny-1)] = U*rho[ind(0,ny-1)];
-		// Top Right Coner
-		rho[ind(nx-1,ny-1)] = 0.5*(rho[ind(nx-1,ny-1)] + rho_p[ind(nx-1,ny-1)]
-				+ b1*U*(-3*rho[ind(nx-1,ny-1)]
-					+4*rho[ind(nx-2,ny-1)]
-					-1*rho[ind(nx-3,ny-1)]));
-		rho_u[ind(nx-1,ny-1)] = U*rho[ind(nx-1,ny-1)];
-		*/
 		// Printer
 		ofstream rho_csv;
 		ofstream rho_u_csv;
@@ -362,7 +317,8 @@ int main() {
 		rho_csv.close();
 		rho_u_csv.close();
 		rho_v_csv.close();
-		//cout << "Completed Iteration: " << step_index << "\n";
+		cout << "Completed Iteration: " << step_index << "\n";
+		*/
 	}
 
 	
