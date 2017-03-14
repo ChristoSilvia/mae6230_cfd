@@ -16,7 +16,7 @@ int ind(int i, int j) {
 
 int main() {
 	// Number of Timesteps
-	int nsteps = 100;
+	int nsteps = 100000;
 
 	// Mesh Parameters
 	nx = 256;
@@ -130,11 +130,11 @@ int main() {
 				rho_v_p[ind(i,j)] = rho_v[ind(i,j)]
 
 				- a1*(	rho_v[ind(i+1,j)]*u[ind(i+1,j)]
-					- rho_v[ind(i,j)]*u[ind(i,j)]
+					- rho_v[ind(i,j)]*u[ind(i,j)])
 
 				- a2*(	rho_v[ind(i,j+1)]*v[ind(i,j+1)]
 					+ c_squared*rho[ind(i,j+1)]
-					- rho_v[ind(i,j)]*v[ind(i,j)])
+					- rho_v[ind(i,j)]*v[ind(i,j)]
 					- c_squared*rho[ind(i,j)])
 
 				+ a3*(	v[ind(i+1,j)]
@@ -183,7 +183,7 @@ int main() {
 						-rho[ind(i-1,ny-1)]);
 			rho_u_p[ind(i,ny-1)] = U*rho_p[ind(i,ny-1)];
 		}
-
+		/*
 		// Corners
 		// Top Left Corner
 		rho_p[ind(0,ny-1)] = rho[ind(0,ny-1)]
@@ -197,7 +197,8 @@ int main() {
 					+4*rho[ind(nx-2,ny-1)]
 					-1*rho[ind(nx-3,ny-1)]);
 		rho_u_p[ind(nx-1,ny-1)] = U*rho_p[ind(nx-1,ny-1)];
-		
+		*/	
+		/*
 		ofstream rho_p_csv;
 		char rho_p_buffer[20];
 		sprintf(rho_p_buffer, "rho_p/rho_p_%04d.csv", step_index);
@@ -210,6 +211,7 @@ int main() {
 			rho_p_csv << rho_p[ind(nx-1,j)] << "\n";
 		}
 		rho_p_csv.close();
+		*/
 	
 		//////////////////////////////////////////////////////
 		// CORRECTOR	
@@ -264,11 +266,11 @@ int main() {
 					+ rho_v_p[ind(i,j)]
 
 				- a1*(	rho_v_p[ind(i,j)]*u[ind(i,j)]
-					- rho_v_p[ind(i-1,j)]*u[ind(i-1,j)]
+					- rho_v_p[ind(i-1,j)]*u[ind(i-1,j)])
 
 				- a2*(	rho_v_p[ind(i,j)]*v[ind(i,j)]
 					+ c_squared*rho_p[ind(i,j)]
-					- rho_v_p[ind(i,j-1)]*v[ind(i,j-1)])
+					- rho_v_p[ind(i,j-1)]*v[ind(i,j-1)]
 					- c_squared*rho_p[ind(i,j-1)])
 
 				+ a3*(	v[ind(i+1,j)]
@@ -318,6 +320,7 @@ int main() {
 			rho_u[ind(i,ny-1)] = U*rho[ind(i,ny-1)];
 		}
 
+		/*
 		// Corners
 		// Top Left Corner
 		rho[ind(0,ny-1)] = 0.5*(rho[ind(0,ny-1)] + rho_p[ind(0,ny-1)]
@@ -331,42 +334,58 @@ int main() {
 					+4*rho[ind(nx-2,ny-1)]
 					-1*rho[ind(nx-3,ny-1)]));
 		rho_u[ind(nx-1,ny-1)] = U*rho[ind(nx-1,ny-1)];
-		
+		*/
 		// Printer
 		ofstream rho_csv;
 		ofstream rho_u_csv;
+		ofstream rho_v_csv;
 		char rho_buffer[16];
 		char rho_u_buffer[20];
-		sprintf(rho_buffer, "rho/rho_%04d.csv", step_index);
-		sprintf(rho_u_buffer, "rho_u/rho_u_%04d.csv", step_index);
+		char rho_v_buffer[20];
+		sprintf(rho_buffer, "rho/rho_%05d.csv", step_index);
+		sprintf(rho_u_buffer, "rho_u/rho_u_%05d.csv", step_index);
+		sprintf(rho_v_buffer, "rho_v/rho_v_%05d.csv", step_index);
 		rho_csv.open(rho_buffer);
 		rho_u_csv.open(rho_u_buffer);
+		rho_v_csv.open(rho_u_buffer);
 		
 		for(int j=0; j<ny; j++){
 			for(int i=0; i<nx-1; i++){
 				rho_csv << rho[ind(i,j)] << ",";
 				rho_u_csv << rho_u[ind(i,j)] << ",";
+				rho_v_csv << rho_v[ind(i,j)] << ",";
 			}
 			rho_csv << rho[ind(nx-1,j)] << "\n";
 			rho_u_csv << rho_u[ind(nx-1,j)] << "\n";
+			rho_v_csv << rho_v[ind(nx-1,j)] << "\n";
 		}
 		rho_csv.close();
 		rho_u_csv.close();
-	
-		cout << "Completed Iteration: " << step_index << "\n";
+		rho_v_csv.close();
+		//cout << "Completed Iteration: " << step_index << "\n";
 	}
 
 	
 	cout << "Completed Simulation\n";
 
 	ofstream rho_csv;
+	ofstream rho_u_csv;
+	ofstream rho_v_csv;
 	rho_csv.open("rho.csv");
+	rho_u_csv.open("rho_u.csv");
+	rho_v_csv.open("rho_v.csv");
 	
 	for(int j=0; j<ny; j++){
 		for(int i=0; i<nx-1; i++){
 			rho_csv << rho[ind(i,j)] << ",";
+			rho_u_csv << rho_u[ind(i,j)] << ",";
+			rho_v_csv << rho_v[ind(i,j)] << ",";
 		}
 		rho_csv << rho[ind(nx-1,j)] << "\n";
+		rho_u_csv << rho_u[ind(nx-1,j)] << "\n";
+		rho_v_csv << rho_v[ind(nx-1,j)] << "\n";
 	}
 	rho_csv.close();
+	rho_u_csv.close();
+	rho_v_csv.close();
 }	
