@@ -3,7 +3,7 @@
 \date{\today}
 
 \documentclass[11pt]{article}
-\usepackage[letterpaper,left=2.2cm,right=2.2cm,top=3cm,bottom=2.5cm]{geometry}
+\usepackage[letterpaper,left=2.2cm,right=2.2cm,top=2.2cm,bottom=2.5cm]{geometry}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \DeclareGraphicsExtensions{.bmp,.png,.jpg,.pdf}
@@ -25,6 +25,10 @@
 
 \begin{document}
 \maketitle
+
+\section*{Organization}
+
+We met to discuss the involved equations, as well as to figure how to efficiently handle the data for the code. We set up a Github repo to collaborate. Crist\'obal began the code, Chris also began the code in parallel, and then merged the progress Crist\'obal had made into his code to complete the code. With the code fully operating, Chris made the graphs to compare with Hou et al. (1995), while Crist\'obal made the streamline plots and finished the write up.
 
 \section{Analytical Equations}
 
@@ -48,43 +52,43 @@ T_{ik} := \rho u_i u_k + p\delta_{ik} - \mu\left(\frac{\partial u_i}{\partial x_
 \end{equation}
 is the stress-energy tensor.
 
-\subsection{Dimensionless Equations}
+%\subsection{Dimensionless Equations}
 
-Introducing a characteristic length scale $H$, velocity $U$, time $H/U$, and density $\rho_0$, we define the dimensionless quantities
-\begin{align}
-x &= H\tilde x,\\
-u_i &= U \tilde{u}_i,\\
-t &= \frac{H}{U}\,\tilde t,\\
-\rho &= \rho_0 \tilde\rho,\\
-p &= \rho c^2 = \rho_0 c^2 \tilde\rho
-\end{align}
-Plugging these definitions into both equations, assuming a constant viscosity, and dropping the tildes, we get the dimensionless equations
-\begin{equation}
-\frac{\partial \rho}{\partial t} + \frac{\partial}{\partial x_k}\left(\rho u_k\right) = 0,
-\end{equation}
-and 
-\begin{equation}
-\frac{\partial}{\partial t}\left(\rho u_i\right) + \frac{\partial T_{ik}}{\partial x_k} = 0,
-\end{equation}
-with
-\begin{equation}
-T_{ik} = \rho u_i u_k + \frac{1}{\Ma^2}\,\delta_{ik}\rho - \frac{1}{\Rey}\left(\frac{\partial u_i}{\partial x_k} + \frac{\partial u_k}{\partial u_i} - \frac{2}{3}\delta_{ik}\frac{\partial u_l}{\partial x_l}\right),
-\end{equation}
-where we introduced the Mach number, $\Ma = U/c$, and the Reynolds number, $\Rey = \rho_0 UH/\mu$.
+%Introducing a characteristic length scale $H$, velocity $U$, time $H/U$, and density $\rho_0$, we define the dimensionless quantities
+%\begin{align}
+%x &= H\tilde x,\\
+%u_i &= U \tilde{u}_i,\\
+%t &= \frac{H}{U}\,\tilde t,\\
+%\rho &= \rho_0 \tilde\rho,\\
+%p &= \rho c^2 = \rho_0 c^2 \tilde\rho
+%\end{align}
+%Plugging these definitions into both equations, assuming a constant viscosity, and dropping the tildes, we get the dimensionless equations
+%\begin{equation}
+%\frac{\partial \rho}{\partial t} + \frac{\partial}{\partial x_k}\left(\rho u_k\right) = 0,
+%\end{equation}
+%and 
+%\begin{equation}
+%\frac{\partial}{\partial t}\left(\rho u_i\right) + \frac{\partial T_{ik}}{\partial x_k} = 0,
+%\end{equation}
+%with
+%\begin{equation}
+%T_{ik} = \rho u_i u_k + \frac{1}{\Ma^2}\,\delta_{ik}\rho - \frac{1}{\Rey}\left(\frac{\partial u_i}{\partial x_k} + \frac{\partial u_k}{\partial u_i} - \frac{2}{3}\delta_{ik}\frac{\partial u_l}{\partial x_l}\right),
+%\end{equation}
+%where we introduced the Mach number, $\Ma = U/c$, and the Reynolds number, $\Rey = \rho_0 UH/\mu$.
 
 \subsection{2-D Equations in Cartesian Equations}
 
 Replacing $x_k = (x,y)$, $u_i = (u, v)$, we obtain
 \begin{align}
-T_{xx} &= \rho u^2 + \frac{1}{\Ma^2}\,\rho - \frac{2}{3\,\Rey}\left( 2\,\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y} \right),\\
-T_{yy} &= \rho v^2 + \frac{1}{\Ma^2}\,\rho - \frac{2}{3\,\Rey}\left( 2\,\frac{\partial v}{\partial y} - \frac{\partial u}{\partial x} \right),\\
-T_{xy} = T_{yx} &= \rho u v - \frac{1}{\Rey}\left( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} \right),
+T_{xx} &= \rho u^2 + c^2\rho - \frac{2\mu}{3}\left( 2\,\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y} \right),\\
+T_{yy} &= \rho v^2 + c^2\rho - \frac{2\mu}{3}\left( 2\,\frac{\partial v}{\partial y} - \frac{\partial u}{\partial x} \right),\\
+T_{xy} = T_{yx} &= \rho u v - \mu\left( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} \right),
 \end{align}
 and the equations we want to solve are
 \begin{align}
 \frac{\partial\rho}{\partial t} + \frac{\partial}{\partial x}\left(\rho u\right) + \frac{\partial}{\partial y}\left(\rho v\right) &= 0,\\
-\frac{\partial}{\partial t}\left(\rho u\right) + \frac{\partial}{\partial x}\left( \rho u^2 + \frac{1}{\Ma^2}\rho \right) + \frac{\partial}{\partial y}\left( \rho u v \right) - \frac{1}{\Rey}\left(\frac{4}{3}\frac{\partial^2u}{\partial x^2} + \frac{1}{3}\frac{\partial^2 v}{\partial x \partial y} + \frac{\partial^2u}{\partial y^2}\right) &= 0,\\
-\frac{\partial}{\partial t}\left( \rho v\right) + \frac{\partial}{\partial x}\left( \rho uv \right) + \frac{\partial}{\partial y}\left( \rho v^2 + \frac{1}{\Ma^2}\rho\right) - \frac{1}{\Rey}\left( \frac{\partial^2 v}{\partial x^2} + \frac{1}{3}\frac{\partial^2u}{\partial x \partial y} +  \frac{4}{3}\frac{\partial^2 v}{\partial y^2} \right) &= 0.
+\frac{\partial}{\partial t}\left(\rho u\right) + \frac{\partial}{\partial x}\left( \rho u^2 + c^2\rho \right) + \frac{\partial}{\partial y}\left( \rho u v \right) - \mu\left(\frac{4}{3}\frac{\partial^2u}{\partial x^2} + \frac{1}{3}\frac{\partial^2 v}{\partial x \partial y} + \frac{\partial^2u}{\partial y^2}\right) &= 0,\\
+\frac{\partial}{\partial t}\left( \rho v\right) + \frac{\partial}{\partial x}\left( \rho uv \right) + \frac{\partial}{\partial y}\left( \rho v^2 + c^2\rho\right) - \mu\left( \frac{\partial^2 v}{\partial x^2} + \frac{1}{3}\frac{\partial^2u}{\partial x \partial y} +  \frac{4}{3}\frac{\partial^2 v}{\partial y^2} \right) &= 0.
 \end{align}
 Here we have explicitly separated the hyperbolic part of each equation from the viscous (diffusive) terms. 
 
@@ -129,35 +133,35 @@ so we still have a second-order accurate discretization independently for each c
 Replacing all the above finite difference expressions, we get
 \begin{align}
 \ind{\rho}{\star}{i}{j} &= \ind{\rho}{n}{i}{j} - a_1\left[ \fDx{(\rho u)}{n}{i}{j}\right] - a_2\left[ \fDy{(\rho v)}{n}{i}{j}\right],\\
-\ind{(\rho u)}{\star}{i}{j} &= \ind{(\rho u)}{n}{i}{j} - a_1\left[ \fDx{(\rho u^2)}{n}{i}{j} + \frac{1}{\Ma^2}\left(\fDx{\rho}{n}{i}{j}\right) \right] - a_2\left[ \fDy{(\rho u v)}{n}{i}{j} \right]\\
+\ind{(\rho u)}{\star}{i}{j} &= \ind{(\rho u)}{n}{i}{j} - a_1\left[ \fDx{(\rho u^2)}{n}{i}{j} + c^2\left(\fDx{\rho}{n}{i}{j}\right) \right] - a_2\left[ \fDy{(\rho u v)}{n}{i}{j} \right]\\
 &\quad + \frac{4a_3}{3}\left[ \cDxx{u}{n}{i}{j} \right] + a_4\left[ \cDyy{u}{n}{i}{j} \right]\\
 &\quad + a_5\left[ \cDxy{v}{n}{i}{j} \right],\\
-\ind{(\rho v)}{\star}{i}{j} &= \ind{(\rho v)}{n}{i}{j} - a_1\left[ \fDx{(\rho u v)}{n}{i}{j} \right]- a_2\left[ \fDy{(\rho v^2)}{n}{i}{j} + \frac{1}{\Ma^2}\left(\fDy{\rho}{n}{i}{j}\right) \right]\\
+\ind{(\rho v)}{\star}{i}{j} &= \ind{(\rho v)}{n}{i}{j} - a_1\left[ \fDx{(\rho u v)}{n}{i}{j} \right]- a_2\left[ \fDy{(\rho v^2)}{n}{i}{j} + c^2\left(\fDy{\rho}{n}{i}{j}\right) \right]\\
 &\quad + a_3\left[ \cDxx{v}{n}{i}{j} \right] + \frac{4a_4}{3}\left[ \cDyy{v}{n}{i}{j} \right]\\
 &\quad + a_5\left[ \cDxy{u}{n}{i}{j} \right]
 \end{align}
 for the predictor step, and
 \begin{align}
 \ind{\rho}{n+1}{i}{j} &= \frac{1}{2}\left[ \ind{\rho}{n}{i}{j} + \ind{\rho}{\star}{i}{j}\right] - \frac{a_1}{2}\left[ \bDx{(\rho u)}{\star}{i}{j}\right] - \frac{a_2}{2}\left[ \bDy{(\rho v)}{\star}{i}{j}\right],\\
-\ind{(\rho u)}{n+1}{i}{j} &= \frac{1}{2}\left[ \ind{(\rho u)}{n}{i}{j} + \ind{(\rho u)}{\star}{i}{j} \right] - \frac{a_1}{2}\left[ \bDx{(\rho u^2)}{\star}{i}{j} + \frac{1}{\Ma^2}\left(\bDx{\rho}{\star}{i}{j}\right) \right]\\
+\ind{(\rho u)}{n+1}{i}{j} &= \frac{1}{2}\left[ \ind{(\rho u)}{n}{i}{j} + \ind{(\rho u)}{\star}{i}{j} \right] - \frac{a_1}{2}\left[ \bDx{(\rho u^2)}{\star}{i}{j} + c^2\left(\bDx{\rho}{\star}{i}{j}\right) \right]\\
 &\quad - \frac{a_2}{2}\left[ \bDy{(\rho u v)}{\star}{i}{j} \right] + \frac{2a_3}{3}\left[ \cDxx{u}{\star}{i}{j} \right]\\
 &\quad + \frac{a_4}{2}\left[ \cDyy{u}{\star}{i}{j} \right] + \frac{a_5}{2}\left[ \cDxy{v}{\star}{i}{j} \right],\\
-\ind{(\rho v)}{n+1}{i}{j} &= \frac{1}{2}\left[ \ind{(\rho v)}{n}{i}{j} + \ind{(\rho v)}{\star}{i}{j} \right] - \frac{a_2}{2}\left[ \bDy{(\rho v^2)}{\star}{i}{j} + \frac{1}{\Ma^2}\left(\bDy{\rho}{\star}{i}{j}\right) \right]\\
+\ind{(\rho v)}{n+1}{i}{j} &= \frac{1}{2}\left[ \ind{(\rho v)}{n}{i}{j} + \ind{(\rho v)}{\star}{i}{j} \right] - \frac{a_2}{2}\left[ \bDy{(\rho v^2)}{\star}{i}{j} + c^2\left(\bDy{\rho}{\star}{i}{j}\right) \right]\\
 &\quad - \frac{a_1}{2}\left[\bDx{(\rho u v)}{\star}{i}{j}\right] + \frac{a_3}{2}\left[ \cDxx{v}{\star}{i}{j} \right]\\
 &\quad + \frac{2a_4}{3}\left[ \cDyy{v}{\star}{i}{j} \right] + \frac{a_5}{2}\left[ \cDxy{u}{\star}{i}{j} \right],
 \end{align}
 for the corrector step, where
 \begin{equation}
-a_1 = \frac{\Delta t}{\Delta x},\quad a_2 = \frac{\Delta t}{\Delta y},\quad a_3 = \frac{\Delta t}{\Rey\,\Delta x^2},\quad a_4 = \frac{\Delta t}{\Rey\,\Delta y^2},\quad a_5 = \frac{\Delta t}{12\Rey\,\Delta x\,\Delta y}.
+a_1 = \frac{\Delta t}{\Delta x},\quad a_2 = \frac{\Delta t}{\Delta y},\quad a_3 = \frac{\mu\Delta t}{\Delta x^2},\quad a_4 = \frac{\mu\Delta t}{\Delta y^2},\quad a_5 = \frac{\mu\Delta t}{12\Delta x\,\Delta y}.
 \end{equation}
-These formulas are valid for interior points only. They coincide with the formulas provided in the Follow-Up document on Blackboard when one extracts the dimensions: $c^2\longrightarrow 1/\Ma^2$ and $\mu \longrightarrow 1/\Rey$.
+These formulas are valid for interior points only. 
 
 \subsection{Boundary Conditions}
 
 Boundary conditions depend on the particular situation we are studying. For the lid-cavity problem with the sliding wall being the top boundary, the boundary conditions for the velocity are
 \begin{align}
-\ind{u}{n}{i}{0} &= 0,\, \ind{u}{n}{i}{n_y-1} = U\quad\text{for }i = 0,\hdots,(n_x-1),\\
-\ind{u}{n}{0}{j} &= \ind{u}{n}{n_x-1}{j} = 0\quad \text{for }j = 1,\hdots,n_y-2,\\
+\ind{u}{n}{i}{0} &= 0,\, \ind{u}{n}{i}{n_y-1} = U\quad\text{for }i = 1,\hdots,(n_x-2),\\
+\ind{u}{n}{0}{j} &= \ind{u}{n}{n_x-1}{j} = 0\quad \text{for }j = 0,\hdots,n_y-1,\\
 \ind{v}{n}{i}{j} &= 0.
 \end{align}
 The boundary conditions for the density are trickier. They can be obtained from the continuity equation applied at every boundary. For example, for the boundary $x = 0$, $v = 0$ so $\partial(\rho v)/\partial y = 0$ there. Then, the continuity equation reads
@@ -194,7 +198,7 @@ for $i = 1,\hdots,n_x-2$. For the top, $u = U$ so $\partial(\rho u)/\partial x =
 &\quad- \frac{a_2}{4}\left[ \ind{(\rho v)}{\star}{i}{n_y - 3} - 4\ind{(\rho v)}{\star}{i}{n_y - 2} + 3\ind{(\rho v)}{\star}{i}{n_y-1} \right],
 \end{align}
 for $i = 1,\hdots,(n_x-2)$. Note that for $\partial\rho/\partial x$ we use a central stencil, which is also second-order accurate. Finally, for each corner, one notes that there are two available formulas provided by the above conditions.
-We simple take the left and right options for each pair of corners, respectively.
+We simple take the conditions determined by the left and right sides, respectively.
 
 \subsection{System Ready to Be Solved!}
 
@@ -208,9 +212,40 @@ We took uniform density everywhere and zero momentum (except at the top boundary
 
 We took the God-given formula
 \begin{equation}
- \Delta t \leq \frac{\sigma}{1 + 2\,\Rey_\Delta}\left[ \frac{U}{\Delta x} + \frac{U}{\Delta y} + \frac{1}{\Ma}\sqrt{\frac{1}{\Delta x^2} + \frac{1}{\Delta y^2}} \right],
+ \Delta t \leq \frac{\sigma}{1 + 2\,/\Rey_\Delta}\left[ \frac{U}{\Delta x} + \frac{U}{\Delta y} + c\sqrt{\frac{1}{\Delta x^2} + \frac{1}{\Delta y^2}} \right]^{-1},
 \end{equation}
-where $\sigma \leq 1$ is a safety parameter, which is arbitrary, and $\Rey_\Delta = \Rey\,\text{min}(\Delta x, \Delta y)$. These formulas are the dimensionless equivalent of those given in the follow-up document on Blackboard.
+where $\sigma \leq 1$ is a safety parameter, which is arbitrary, and $\Rey_\Delta = \text{min}(\rho\Delta x|u|/\mu, \rho\Delta y|v|/\mu)$, where the values in bar are understood to be
+the maximum values over the domain.
 
+
+\section{Results}
+
+\subsection{Comparison with Hou et al. (1995)}
+
+
+\subsection{Streamlines}
+
+Figure \ref{streamlines} show the streamlines for different timesteps during the evolution. In these plots, $\Rey = 100$ and the color code indicates the speed of the flow, defined as $\sqrt{u^2 + v^2}$. Starting from the initial condition of zero momentum, we observe the formation of a primary circulating eddy, which induces the formation of two secondary counter-rotating eddies at the bottom corners. This is in agreement with Hou et al. (1995) and the results analyzed there. By the end of the simulation, we confirm that the flow pattern remains stable in time, presenting the steady flow shown in Fig. \ref{steady}. For comparison, we also include the result from Hou et al., finding a remarkable agreement between both results.
+
+\begin{center}
+\begin{figure}[ht!]
+\begin{minipage}{16cm}\label{streamlines}
+\includegraphics[width=8cm]{seq01}\includegraphics[width=8cm]{seq02}
+\includegraphics[width=8cm]{seq03}\includegraphics[width=8cm]{seq04}
+\includegraphics[width=8cm]{seq05}\includegraphics[width=8cm]{seq06}
+\includegraphics[width=8cm]{seq07}\includegraphics[width=8cm]{seq08}
+\end{minipage}
+\caption{Streamlines at different times.}
+\end{figure}
+\end{center}
+
+\begin{center}
+\begin{figure}[ht!]
+\begin{minipage}{16cm}\label{steady}
+\includegraphics[width=9cm]{final}\includegraphics[width=6.5cm]{HouStreamlines}
+\end{minipage}
+\caption{Steady state. Comparison with Hou et al. (1995)}
+\end{figure}
+\end{center}
 
 \end{document}
