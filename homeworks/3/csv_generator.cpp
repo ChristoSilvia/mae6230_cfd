@@ -42,7 +42,8 @@ int main() {
 	// Time Parameters
 	float sigma = 0.3;
 	float Re_delta = rho_0*U/mu*min(dx, dy);
-	float dt = sigma/((1.0 + 2.0/Re_delta)*(U/dx + U/dy + c*sqrt(1/dx/dx + 1/dy/dy)));
+	float dt = sigma/((1.0 + 2.0/Re_delta)
+		*(U/dx + U/dy + c*sqrt(1/dx/dx + 1/dy/dy)));
 
 	// Product Coefficients
 	float a1 = dt/dx;
@@ -274,7 +275,8 @@ int main() {
 					- u[ind(i-1,j+1)] ));
 			}
 			// Right Boundary
-			rho[ind(nx-1,j)] = 0.5*(rho[ind(nx-1,j)] + rho_p[ind(nx-1,j)]
+			rho[ind(nx-1,j)] = 0.5*(rho[ind(nx-1,j)] 
+					+ rho_p[ind(nx-1,j)]
 					+ b1*(	-3*rho_u_p[ind(nx-1,j)]
 						+4*rho_u_p[ind(nx-2,j)]
 						-1*rho_u_p[ind(nx-3,j)]));
@@ -282,7 +284,8 @@ int main() {
 
 		// Top Boundary
 		for(int i=1; i<nx-1; i++){
-			rho[ind(i,ny-1)] = 0.5*(rho[ind(i,ny-1)] + rho_p[ind(i,ny-1)]
+			rho[ind(i,ny-1)] = 0.5*(rho[ind(i,ny-1)] 
+					+ rho_p[ind(i,ny-1)]
 					+ b2*(	-3*rho_v[ind(i,ny-1)]
 						+4*rho_v[ind(i,ny-2)]
 						-1*rho_v[ind(i,ny-3)])

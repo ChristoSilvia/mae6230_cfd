@@ -10,6 +10,7 @@
 \usepackage{amsmath}
 \usepackage{courier}
 \usepackage{natbib}
+\usepackage{listings}
 \linespread{1.2}
 
 \newcommand{\Ma}{\text{Ma}}
@@ -222,6 +223,16 @@ the maximum values over the domain.
 
 \subsection{Comparison with Hou et al. (1995)}
 
+Figure \ref{Central Profile} shows the $u$ velocity along the center line of the simulation region, at $x=H/2$, and compares it to Hou et al., who determined the velocity using a lattice boltzmann method.  We see that there is good agreement with Hou's profile, in both the qualitative shape, and the approximate location of the transition from negative to positive velocities.
+
+\begin{center}
+\begin{figure}[ht!]
+\begin{minipage}{16cm}\label{Central Profile}
+\includegraphics[width=8cm]{hou_cropped}\includegraphics[width=8cm]{u_profile}
+\end{minipage}
+\caption{Central Streamline, compared to Hou et al. (1995).  Recall for us, $Re=100$.}
+\end{figure}
+\end{center}
 
 \subsection{Streamlines}
 
@@ -247,5 +258,10 @@ Figure \ref{streamlines} show the streamlines for different timesteps during the
 \caption{Steady state. Comparison with Hou et al. (1995)}
 \end{figure}
 \end{center}
+
+\appendix
+\section{Code}
+
+\lstinputlisting[language=c++]{csv_generator.cpp}
 
 \end{document}
