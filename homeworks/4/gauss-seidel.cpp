@@ -9,12 +9,12 @@ int ind(int i, int j){
 }
 
 int main(){
-	int nits = 1000;
+	int nits = 4000;
 	int sample_interval = 1;
 
 	// good multigrid numbers are powers of 2 plus 1
-	nx = 65;
-	ny = 65;
+	nx = 17;
+	ny = 17;
 	N = nx*ny;
 	float delta = 1.0/(nx-1);
 	float delta_squared = delta*delta;
@@ -53,18 +53,11 @@ int main(){
 			l2_err=0;
 			for(int j=1; j<ny-1; j++){
 				for(int i=1; i<nx-1; i++){
-					laplacian_times_delta_squared_here =
-						-4.0*u[ind(i,j)]
-						+u[ind(i,j-1)]
-						+u[ind(i-1,j)]
-						+u[ind(i+1,j)]
-						+u[ind(i,j+1)];
-					error_here = laplacian_times_delta_squared_here
-					- source_times_delta_squared[ind(i,j)];
+					error_here = u[ind(i,j)]-usol[ind(i,j)];
 					l2_err += error_here*error_here;
 				}
 			}
-			cout << "L2 err: " << l2_err << "\n";
+			cout << l2_err << "\n";
 		}
 	}
 }
