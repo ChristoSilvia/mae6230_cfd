@@ -51,7 +51,10 @@ int main()
     float U = 1.0;
     float dx = H/nx;
     float dy = H/ny;
-    float dt = 0.001;// Stability criterion!!!
+    
+    float sigma = 0.9;
+    float Re_d = Re*min(dx,dy);
+    float dt = sigma/( 1.0 + 2.0/Re_d )/( U/dx + U/dy + sqrt( 1.0/dx/dx + 1.0/dy/dy ) );
 
     float a1 = dt/dx;
     float a2 = dt/dy;
