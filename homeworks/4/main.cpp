@@ -46,6 +46,10 @@ int main()
     Nu = (nx+1)*ny;// # of u-vel variables
     Nv = nx*(ny+1);// # of v-vel variables
 
+    int gs_tol_interval = 100; // Every 100 steps, check the error
+    float l2err; // Float for keeping track of error in pressure poisson solution
+    float l2tol = 1e-8; // If error is less than this, stop the iteration
+
     float Re = 100;
     float H = 1.0;
     float U = 1.0;
@@ -66,6 +70,7 @@ int main()
     v = new float[Nv];// v_{i, j-1/2}
     up = new float[Nu];// u^\star_{i-1/2, j}
     vp = new float[Nv];// v^star_{i, j-1/2}
+    source_term = new float[N]; // (D_x u^\star + D_y v^\star)/dt
 
 
     /* Initial conditions for all the cells */
@@ -178,10 +183,142 @@ int main()
             for(int i=0; i<nx; i++)
                 volume_integral += (1/dx)*( up[ind(i+1,j,nx)] - up[ind(i,j,nx)] ) + (1/dy)*( vp[ind(i,j+1,nx-1)] - vp[ind(i,j,nx-1)] );
 
-        /* Here we call the Poisson solver, giving p, up, and vp. */
+        /* Here we make the source term of p */
 
+        for(int j=0; j<ny; j++){
+            for(int i=0; i<nx; i++){
+                source_term[ind(i,j)]=((up[ind(i+1,j,nx)] - up[ind(i,j,nx)])/dx
+                    + (vp[ind(i,j+1,nx-1)] - vp[ind(i,j,nx-1)]))/dt;
+            }
+        }
 
-        // do some stuff
+        /* Here we do our Gauss-Seidel Iterations */
+        
+        l2err = 1.0; // Higher than tolerance so first iteration runs
+        while(l2err > l2tol){
+            for(int it=0; it<gs_tol_interval; it++){
+                // Update in raster order to minimize cache misses
+                // Update bottom left corner
+                p[ind(0,0,nx)] = (p[ind(1,0,nx)]
+                    +p[ind(0,1,nx)]
+                    -source_term[ind(0,0,nx)]*dx*dx)/2.0;
+                // Update Bottom Wall
+                for(int i=1; i<nx-1; i++){
+                    p[ind(i,0,nx)] = (p[ind(i-1,0,nx)]
+                        +p[ind(i+1,0,nx)]
+                        +p[ind(i,1,nx)]
+                        -source_term[ind(i,0,nx)]*dx*dx)/3.0;
+                }
+                // update bottom right corner
+                p[ind(nx-1,0,nx)] = (p[ind(nx-2,0,nx)]
+                    +p[ind(nx-1,0,nx)]
+                    +p[ind(nx-1,1,nx)]
+                    -source_term[ind(nx-1,0,nx)]*dx*dx)/3.0;
+                // Loop over rows
+                for(int j=1; j<ny-1; j++){
+                    // Left Element
+                    p[ind(0,j,nx)] = (p[ind(0,j-1,nx)]
+                        +p[ind(1,j,nx)]
+                        +p[ind(0,j+1,nx)]
+                        -source_term[ind(0,j,nx)]*dx*dx)/3.0;
+                    for(int i=0; i<nx-1; i++){
+                        // Central Element
+                        p[ind(i,j,nx)] = (p[ind(i,j-1,nx)]
+                            +p[ind(i-1,j,nx)]
+                            +p[ind(i+1,j,nx)]
+                            +p[ind(i,j+1,nx)]
+                            -source_term[ind(i,j,nx)]*dx*dx)/4.0;
+                    }
+                    // Right Element
+                    p[ind(nx-1,j,nx)] = (p[ind(nx-1,j-1)]
+                        +p[ind(nx-2,j,nx)]
+                        +p[ind(nx-1,j,nx)]
+                        +p[ind(nx-1,j+1,nx)]
+                        -source_term[ind(nx-1,j,nx)]*dx*dx)/4.0;
+                }
+                // Top Row
+                // Top Left Element
+                p[ind(0,ny-1,nx)] = (p[ind(0,ny-2,nx)]
+                    +p[ind(0,ny-1,nx)]
+                    +p[ind(1,ny-1,nx)]
+                    -source_term[ind(0,ny-1,nx)]*dx*dx)/3.0;
+                // Top Row Elements
+                for(int i = 1; i<nx-1; i++){
+                    p[ind(i,ny-1,nx)] = (p[ind(i,ny-2,nx)]
+                        +p[ind(i-1,ny-1,nx)]
+                        +p[ind(i,ny-1,nx)]
+                        +p[ind(i+1,ny-1,nx)]
+                        -source_term[ind(i,ny-1,nx)]*dx*dx)/4.0;
+                }
+                // Top Right Element
+                p[ind(nx-1,ny-1,nx)] = (p[ind(nx-1,ny-2,nx)]
+                    +p[ind(nx-2,ny-1)]
+                    +2*p[ind(nx-1,ny-1)]
+                    -source_term[ind(nx-1,ny-1,nx)]*dx*dx)/4.0;
+            }
+            l2err = 0.0;
+            // Bottom Left Element
+            l2err += pow(2*p[ind(0,0,nx)]
+                -p[ind(1,0,nx)]
+                -p[ind(0,1,nx)]
+                +source_term[ind(0,0,nx)]*dx*dx,2);
+            // Bottom Row
+            for(int i=1; i<nx-1; i++){
+                l2err += pow(3*p[ind(i,0,nx)]
+                    -p[ind(i-1,0,nx)]
+                    -p[ind(i+1,0,nx)]
+                    -p[ind(i,1,nx)]
+                    +source_term[ind(i,0,nx)]*dx*dx,2);
+            }
+            // Bottom Right Element
+            l2err += pow(2*p[ind(nx-1,0,nx)]
+                -p[ind(nx-2,0,nx)]
+                -p[ind(nx-1,1,nx)]
+                +source_term[ind(nx-1,0,nx)]*dx*dx,2);
+            // Interior Rows
+            for(int j=1; j<ny-1; j++){
+                // Left Row
+                l2err += pow(3*p[ind(0,j,nx)]
+                    -p[ind(0,j-1,nx)]
+                    -p[ind(1,j,nx)]
+                    -p[ind(0,j+1,nx)]
+                    +source_term[ind(0,j,nx)]*dx*dx,2);
+                // Central Rows
+                for(int i=1; i<nx-1; i++){
+                    l2err += pow(4*p[ind(i,j,nx)]
+                        -p[ind(i,j-1,nx)]
+                        -p[ind(i-1,j,nx)]
+                        -p[ind(i+1,j,nx)]
+                        -p[ind(i,j+1,nx)]
+                        +source_term[ind(i,j,nx)]*dx*dx,2); 
+                }
+                // Right Row
+                l2err += pow(3*p[ind(nx-1,j,nx)]
+                    -p[ind(nx-1,j-1,nx)]
+                    -p[ind(nx-2,j,nx)]
+                    -p[ind(nx-1,j+1,nx)]
+                    +source_term[ind(nx-1,j,nx)]*dx*dx,2);
+            }
+            // Top Left Element
+            l2err += pow(2*p[ind(0,ny-1,nx)]
+                -p[ind(1,ny-1,nx)]
+                -p[ind(0,ny-2,nx)]
+                +source_term[ind(0,ny-1,nx)]*dx*dx,2);
+            // Top Row
+            for(int i=1; i<nx-1; i++){
+                l2err += pow(3*p[ind(i,ny-1,nx)]
+                    -p[ind(i-1,ny-1,nx)]
+                    -p[ind(i+1,ny-1,nx)]
+                    -p[ind(i,ny-2,nx)]
+                    +source_term[ind(i,ny-1,nx)]*dx*dx,2);
+            }
+            // Top Right Element
+            l2err += pow(2*p[ind(nx-1,ny-1,nx)]
+                -p[ind(nx-2,ny-1,nx)]
+                -p[ind(nx-1,ny-2,nx)]
+                +source_term[ind(nx-1,ny-1,nx)]*dx*dx,2);
+                
+        }
 
 
         /* OK, we have the new p so we can compute the new velocities. */
