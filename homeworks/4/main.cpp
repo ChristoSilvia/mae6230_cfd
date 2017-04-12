@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 using namespace std;
@@ -40,8 +41,8 @@ float v_lbc(int i, int j)// v at the left bottom corner of the cell, v_{i-1/2, j
 /* FUNCTION: main */
 int main()
 {
-    nx = 12;
-    ny = 12;
+    nx = 32;
+    ny = 32;
     N = nx*ny;// # of pressure variables
     Nu = (nx+1)*ny;// # of u-vel variables
     Nv = nx*(ny+1);// # of v-vel variables
@@ -56,7 +57,7 @@ int main()
     float dx = H/nx;
     float dy = H/ny;
     
-    float sigma = 0.9;
+    float sigma = 0.1;
     float Re_d = Re*min(dx,dy);
     float dt = sigma/( 1.0 + 2.0/Re_d )/( U/dx + U/dy + sqrt( 1.0/dx/dx + 1.0/dy/dy ) );
 
@@ -70,7 +71,6 @@ int main()
     v = new float[Nv];// v_{i, j-1/2}
     up = new float[Nu];// u^\star_{i-1/2, j}
     vp = new float[Nv];// v^star_{i, j-1/2}
-    source_term = new float[N]; // (D_x u^\star + D_y v^\star)/dt
 
 
     /* Initial conditions for all the cells */
@@ -101,11 +101,11 @@ int main()
     /* End of boundary conditions at the walls */
 
 
-    int Nt = 10;// # of iterations in the simulation
+    int Nt = 10000;// # of iterations in the simulation
 
 
     /* Simulation begins */
-    for(int n=1; n<=Nt; n++)
+    for(int n=0; n<=Nt; n++)
     {
         /* interior cells */
         for(int j=1; j<ny-1; j++)
@@ -169,14 +169,6 @@ int main()
                                 + a3*( u[ind(i+1,j,nx)] - 2.0*u[ind(i,j,nx)] + u[ind(i-1,j,nx)] )
                                 + a4*( 2.0*u_tw - 3.0*u[ind(i,ny-1,nx)] + u[ind(i,ny-2,nx)] );// Term that is different from inner cells
         }
-        // some tests
-        // print something on console
-        for(int j=0; j<ny; j++)
-        {
-            for(int i=0; i<=nx; i++)
-                cout << "\t" << u[ind(i,j,nx)];
-            cout << "\n";
-        }
         // Page 7 on assignment: the RHSs of Eq. (16) should be zero.
         float volume_integral = 0.0;// sum of all RHSs of the Poisson Equation.
         for(int j=0; j<ny; j++)
@@ -185,140 +177,208 @@ int main()
 
         /* Here we make the source term of p */
 
-        for(int j=0; j<ny; j++){
-            for(int i=0; i<nx; i++){
-                source_term[ind(i,j)]=((up[ind(i+1,j,nx)] - up[ind(i,j,nx)])/dx
-                    + (vp[ind(i,j+1,nx-1)] - vp[ind(i,j,nx-1)]))/dt;
-            }
-        }
 
         /* Here we do our Gauss-Seidel Iterations */
+
+        // loop control variables        
+        bool not_over = true;
+        int nits = 0;
+        float error = 0.0;
+        float last_error = 100.0;
+
+        // common fractions
+        float half = 0.5;
+        float third = 1.0/3.0;
+        float fourth = 0.25;
+
+        // ratios
+        float xfactor = dx/dt;
+        float yfactor = dy/dx;
+        float invdeltasq = 1.0/dx/dx;
+        float xerrfactor = 1.0/dx/dt;
+        float yerrfactor = 1.0/dy/dt;
+
+        // indices
+        int i,j;
         
-        l2err = 1.0; // Higher than tolerance so first iteration runs
-        while(l2err > l2tol){
-            for(int it=0; it<gs_tol_interval; it++){
-                // Update in raster order to minimize cache misses
-                // Update bottom left corner
-                p[ind(0,0,nx)] = (p[ind(1,0,nx)]
-                    +p[ind(0,1,nx)]
-                    -source_term[ind(0,0,nx)]*dx*dx)/2.0;
-                // Update Bottom Wall
-                for(int i=1; i<nx-1; i++){
-                    p[ind(i,0,nx)] = (p[ind(i-1,0,nx)]
-                        +p[ind(i+1,0,nx)]
-                        +p[ind(i,1,nx)]
-                        -source_term[ind(i,0,nx)]*dx*dx)/3.0;
-                }
-                // update bottom right corner
-                p[ind(nx-1,0,nx)] = (p[ind(nx-2,0,nx)]
-                    +p[ind(nx-1,0,nx)]
-                    +p[ind(nx-1,1,nx)]
-                    -source_term[ind(nx-1,0,nx)]*dx*dx)/3.0;
-                // Loop over rows
-                for(int j=1; j<ny-1; j++){
-                    // Left Element
-                    p[ind(0,j,nx)] = (p[ind(0,j-1,nx)]
-                        +p[ind(1,j,nx)]
-                        +p[ind(0,j+1,nx)]
-                        -source_term[ind(0,j,nx)]*dx*dx)/3.0;
-                    for(int i=0; i<nx-1; i++){
-                        // Central Element
-                        p[ind(i,j,nx)] = (p[ind(i,j-1,nx)]
-                            +p[ind(i-1,j,nx)]
-                            +p[ind(i+1,j,nx)]
-                            +p[ind(i,j+1,nx)]
-                            -source_term[ind(i,j,nx)]*dx*dx)/4.0;
-                    }
-                    // Right Element
-                    p[ind(nx-1,j,nx)] = (p[ind(nx-1,j-1)]
-                        +p[ind(nx-2,j,nx)]
-                        +p[ind(nx-1,j,nx)]
-                        +p[ind(nx-1,j+1,nx)]
-                        -source_term[ind(nx-1,j,nx)]*dx*dx)/4.0;
-                }
-                // Top Row
-                // Top Left Element
-                p[ind(0,ny-1,nx)] = (p[ind(0,ny-2,nx)]
-                    +p[ind(0,ny-1,nx)]
-                    +p[ind(1,ny-1,nx)]
-                    -source_term[ind(0,ny-1,nx)]*dx*dx)/3.0;
-                // Top Row Elements
-                for(int i = 1; i<nx-1; i++){
-                    p[ind(i,ny-1,nx)] = (p[ind(i,ny-2,nx)]
-                        +p[ind(i-1,ny-1,nx)]
-                        +p[ind(i,ny-1,nx)]
-                        +p[ind(i+1,ny-1,nx)]
-                        -source_term[ind(i,ny-1,nx)]*dx*dx)/4.0;
-                }
-                // Top Right Element
-                p[ind(nx-1,ny-1,nx)] = (p[ind(nx-1,ny-2,nx)]
-                    +p[ind(nx-2,ny-1)]
-                    +2*p[ind(nx-1,ny-1)]
-                    -source_term[ind(nx-1,ny-1,nx)]*dx*dx)/4.0;
+        cout << "writing source term\n";
+        ofstream sourcef;
+        char source_buffer_fname[23];
+        sprintf(source_buffer_fname, "source/source_%05d.csv", n);
+        cout << source_buffer_fname << "\n";
+        sourcef.open(source_buffer_fname);
+        // write source term
+        for(j=0; j<ny; j++){
+            for(i=0; i<nx; i++){
+                sourcef << xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                         + yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]) << "\n";
             }
-            l2err = 0.0;
-            // Bottom Left Element
-            l2err += pow(2*p[ind(0,0,nx)]
-                -p[ind(1,0,nx)]
-                -p[ind(0,1,nx)]
-                +source_term[ind(0,0,nx)]*dx*dx,2);
-            // Bottom Row
-            for(int i=1; i<nx-1; i++){
-                l2err += pow(3*p[ind(i,0,nx)]
-                    -p[ind(i-1,0,nx)]
-                    -p[ind(i+1,0,nx)]
-                    -p[ind(i,1,nx)]
-                    +source_term[ind(i,0,nx)]*dx*dx,2);
-            }
-            // Bottom Right Element
-            l2err += pow(2*p[ind(nx-1,0,nx)]
-                -p[ind(nx-2,0,nx)]
-                -p[ind(nx-1,1,nx)]
-                +source_term[ind(nx-1,0,nx)]*dx*dx,2);
-            // Interior Rows
-            for(int j=1; j<ny-1; j++){
-                // Left Row
-                l2err += pow(3*p[ind(0,j,nx)]
-                    -p[ind(0,j-1,nx)]
-                    -p[ind(1,j,nx)]
-                    -p[ind(0,j+1,nx)]
-                    +source_term[ind(0,j,nx)]*dx*dx,2);
-                // Central Rows
-                for(int i=1; i<nx-1; i++){
-                    l2err += pow(4*p[ind(i,j,nx)]
-                        -p[ind(i,j-1,nx)]
-                        -p[ind(i-1,j,nx)]
-                        -p[ind(i+1,j,nx)]
-                        -p[ind(i,j+1,nx)]
-                        +source_term[ind(i,j,nx)]*dx*dx,2); 
-                }
-                // Right Row
-                l2err += pow(3*p[ind(nx-1,j,nx)]
-                    -p[ind(nx-1,j-1,nx)]
-                    -p[ind(nx-2,j,nx)]
-                    -p[ind(nx-1,j+1,nx)]
-                    +source_term[ind(nx-1,j,nx)]*dx*dx,2);
-            }
-            // Top Left Element
-            l2err += pow(2*p[ind(0,ny-1,nx)]
-                -p[ind(1,ny-1,nx)]
-                -p[ind(0,ny-2,nx)]
-                +source_term[ind(0,ny-1,nx)]*dx*dx,2);
-            // Top Row
-            for(int i=1; i<nx-1; i++){
-                l2err += pow(3*p[ind(i,ny-1,nx)]
-                    -p[ind(i-1,ny-1,nx)]
-                    -p[ind(i+1,ny-1,nx)]
-                    -p[ind(i,ny-2,nx)]
-                    +source_term[ind(i,ny-1,nx)]*dx*dx,2);
-            }
-            // Top Right Element
-            l2err += pow(2*p[ind(nx-1,ny-1,nx)]
-                -p[ind(nx-2,ny-1,nx)]
-                -p[ind(nx-1,ny-2,nx)]
-                +source_term[ind(nx-1,ny-1,nx)]*dx*dx,2);
-                
         }
+        sourcef.close();
+        
+
+        while(not_over) {
+            // lower left corner
+            i=0; j=0;
+            p[ind(i,j,nx)] = half*(p[ind(i+1,j,nx-1)] 
+                                 + p[ind(i,j+1,nx-1)] 
+                                 - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                 - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            // lower boundary
+            j=0;
+            for(i=1; i<nx-1; i++){
+                p[ind(i,j,nx)] = third*(p[ind(i-1,j,nx-1)] 
+				      + p[ind(i+1,j,nx-1)] 
+                                      + p[ind(i,j+1,nx-1)] 
+                                      - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                      - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            }
+            // lower right corner
+            i=nx-1; j=0;
+            p[ind(i,j,nx)] = half*(p[ind(i-1,j,nx-1)] 
+                                 + p[ind(i,j+1,nx-1)] 
+                                 - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                 - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            // main loop
+            for(j=1; j<ny-1; j++){
+                // left wall
+                i=0;
+                p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx-1)] 
+				      + p[ind(i+1,j,nx-1)] 
+                                      + p[ind(i,j+1,nx-1)] 
+                                      - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                      - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                // interior
+                for(i=1; i<nx-1; i++){
+                    p[ind(i,j,nx)] = fourth*(p[ind(i,j-1,nx-1)] 
+	            		          + p[ind(i-1,j,nx-1)] 
+	            		          + p[ind(i+1,j,nx-1)] 
+                                          + p[ind(i,j+1,nx-1)] 
+                                          - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                          - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                }
+                // right wall
+                i=nx-1;
+                p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx-1)] 
+				      + p[ind(i-1,j,nx-1)] 
+                                      + p[ind(i,j+1,nx-1)] 
+                                      - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                      - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            }
+            // upper left corner
+            i=0; j=ny-1;
+            p[ind(i,j,nx)] = half*(p[ind(i+1,j,nx-1)] 
+                                 + p[ind(i,j-1,nx-1)] 
+                                 - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                 - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            // upper boundary
+            j=ny-1;
+            for(i=1; i<nx-1; i++){
+                p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx-1)] 
+				      + p[ind(i-1,j,nx-1)] 
+                                      + p[ind(i+1,j,nx-1)] 
+                                      - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                      - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            }
+            // upper right corner
+            i=nx-1; j=ny-1;
+            p[ind(i,j,nx)] = half*(p[ind(i-1,j,nx-1)] 
+                                 + p[ind(i,j-1,nx-1)] 
+                                 - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                 - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+            /*
+            error = 0.0;
+            if(nits % 100 == 0){
+                // calculate l-infinity error
+                // lower left corner
+                i=0; j=0;
+                error = max(abs( p[ind(i+1,j,nx)] + p[ind(i,j+1,nx)] - 2*p[ind(i,j,nx)]
+half*(p[ind(i+1,j,nx)] 
+                                     + p[ind(i,j+1,nx)] 
+                                     - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                     - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                // lower boundary
+                j=0;
+                for(i=1; i<nx-1; i++){
+                    p[ind(i,j,nx)] = third*(p[ind(i-1,j,nx)] 
+            			      + p[ind(i+1,j,nx)] 
+                                          + p[ind(i,j+1,nx)] 
+                                          - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                          - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                }
+                // lower right corner
+                i=nx-1; j=0;
+                p[ind(i,j,nx)] = half*(p[ind(i-1,j,nx)] 
+                                     + p[ind(i,j+1,nx)] 
+                                     - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                     - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                // main loop
+                for(j=1; j<ny-1; j++){
+                    // left wall
+                    i=0;
+                    p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx)] 
+            			      + p[ind(i+1,j,nx)] 
+                                          + p[ind(i,j+1,nx)] 
+                                          - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                          - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                    // interior
+                    for(i=1; i<nx-1; i++){
+                        p[ind(i,j,nx)] = fourth*(p[ind(i,j-1,nx)] 
+                        		          + p[ind(i-1,j,nx)] 
+                        		          + p[ind(i+1,j,nx)] 
+                                              + p[ind(i,j+1,nx)] 
+                                              - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                              - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                    }
+                    // right wall
+                    i=nx-1;
+                    p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx)] 
+            			      + p[ind(i-1,j,nx)] 
+                                          + p[ind(i,j+1,nx)] 
+                                          - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                          - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                }
+                // upper left corner
+                i=0; j=ny-1;
+                p[ind(i,j,nx)] = half*(p[ind(i+1,j,nx)] 
+                                     + p[ind(i,j-1,nx)] 
+                                     - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                     - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                // upper boundary
+                j=ny-1;
+                for(i=1; i<nx-1; i++){
+                    p[ind(i,j,nx)] = third*(p[ind(i,j-1,nx)] 
+            			      + p[ind(i-1,j,nx)] 
+                                          + p[ind(i+1,j,nx)] 
+                                          - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                          - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                }
+                // upper right corner
+                i=nx-1; j=ny-1;
+                p[ind(i,j,nx)] = half*(p[ind(i-1,j,nx)] 
+                                     + p[ind(i,j-1,nx)] 
+                                     - xfactor*(u[ind(i+1,j,nx)]-u[ind(i,j,nx)])
+                                     - yfactor*(v[ind(i,j+1,nx-1)]-v[ind(i,j,nx-1)]));
+                */
+            if(true){
+                cout << "writing file\n";
+                ofstream pf;
+                char p_buffer_fname[22];
+                sprintf(p_buffer_fname, "press%05d/p_%05d.csv", n, nits);
+                cout << p_buffer_fname << "\n";
+                pf.open(p_buffer_fname);
+                // write p
+                for(int k=0; k<N; k++)
+                    pf << p[k] << "\n";
+                pf.close();
+            }
+            nits++;
+            if(nits > 1000)
+                not_over=false;
+        }
+
+
+                
 
 
         /* OK, we have the new p so we can compute the new velocities. */
@@ -336,6 +396,32 @@ int main()
             u[ind(i,ny-1,nx)] = up[ind(i,ny-1,nx)] - a1*( p[ind(i,ny-1,nx-1)] - p[ind(i-1,ny-1,nx-1)] );
 
 
+        if(true){
+            ofstream uf;
+            ofstream vf;
+            ofstream pf;
+            char u_buffer_fname[15];
+            char v_buffer_fname[15];
+            char p_buffer_fname[15];
+            sprintf(u_buffer_fname, "run/u_%05d.csv", n);
+            sprintf(v_buffer_fname, "run/v_%05d.csv", n);
+            sprintf(p_buffer_fname, "run/p_%05d.csv", n);
+            uf.open(u_buffer_fname);
+            vf.open(v_buffer_fname);
+            pf.open(p_buffer_fname);
+            // write u
+            for(int k=0; k<Nu; k++)
+                uf << u[k] << "\n";
+            // write v
+            for(int k=0; k<Nv; k++)
+                vf << v[k] << "\n";
+            // write p
+            for(int k=0; k<N; k++)
+                pf << p[k] << "\n";
+            uf.close();
+            vf.close();
+            pf.close();
+        }
 
     cout << "\t Iteration " << n << " done. Volume integral :" << volume_integral << "\n\n";
     }/* Simulation ends */
